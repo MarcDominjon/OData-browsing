@@ -1,18 +1,24 @@
 enyo.kind({
 	name: 'metadata',
-	published: {url : ''},
+	url : '',
 	components: [
 		{kind:"onyx.Toolbar",components:[
-			{content :"Metadata and entitySets"}
+			{kind: "onyx.Button", name:"backbutton",content: "Back", showing:true, ontap:"goBack", style: "background-color: green; color: #F1F1F1;"},
+			{content: '', name: 'title'}
 		]},
 		{tag: 'div', name: 'metadataOdata', fit: true}
 	],
 		
-	events: {onEntitySelected:""},
+	events: {
+		onEntitySelected:"",
+		onBack: ""
+	},
 	
 	create : function() {
 		var metadata = '/$metadata';
 		this.inherited(arguments);
+		this.$.title.setContent("Metadata and entitySets of: " + this.url);
+		OData.defaultMetadata = [];
 		OData.read(
 			this.url + metadata, 
 			enyo.bind(this,"processResults"), 
@@ -21,10 +27,11 @@ enyo.kind({
 		);
 	},
 	
-	processResults : function(data) {	
+	processResults : function(data) {
 		OData.defaultMetadata.push(data);
 		this.metadata = data;
-		var text = "var metadata = " + enyo.json.stringify(data) + ";";
+		this.log(data);
+		var text = "var metadata = " + enyo.json.stringify(data,null,2) + ";";
 		this.createComponent({
 			name: 'metadataInfo',
 			tag: 'p',
@@ -56,11 +63,15 @@ enyo.kind({
 	},
 	
 	processError : function(err) {	
-		enyo.log(err);
+		this.log(err);
 	},
 	
 	entitySelected:function(inSender,inEvent){
 		this.doEntitySelected({entityType: inEvent.originator.entityTypeInfo});
+	},
+	
+	goBack:function(inSender,inEvent){
+		this.doBack();
 	}
 
 });

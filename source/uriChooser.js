@@ -1,66 +1,74 @@
 enyo.kind({
-	name: 'uriChooser',
-	published: {url : ''},
+	name: "uriChooser",
+	classes: "list-sample enyo-fit",
+	events: {onUriSelected: "", onNewUri: ""},
+	handlers: {onAddUri: "addUri"},
 	components: [
-		{kind:"onyx.Toolbar",components:[
-			{content :"Metadata and entitySets"}
+		{name: "uriList", kind: "enyo.List", multiSelect: false, classes: "enyo-fit list-sample-list", onSetupItem: "setupItem", components: [
+			{name: "item", classes: "list-sample-item enyo-border-box", ontap: "uriSelected", components: [
+				{name: "uri"}
+			]}
 		]},
-		{tag: 'div', name: 'metadataOdata', fit: true}
+		{kind: "onyx.InputDecorator", components: [
+				{kind: "onyx.Input", name: "other", placeholder: "Enter URI here"}
+		], style: "margin: 10px;"},
+		{kind: 'onyx.Button', content: 'Add a new uri',	ontap: "newUri", style: "background-color: brown; color: #F1F1F1; margin: 10px;"}
 	],
-		
-	events: {onEntitySelected:""},
-	
-	create : function() {
-		var metadata = '/$metadata';
+	uriStandard: [
+		"http://services.odata.org/Northwind/Northwind.svc",
+		"http://services.odata.org/OData/OData.svc",
+		"http://services.odata.org/(S(zxibds3pxh30cejlp1tkkbki))/OData/OData.svc"
+	],
+	uriString: "http://services.odata.org/Northwind/Northwind.svc,http://services.odata.org/OData/OData.svc,http://services.odata.org/(S(zxibds3pxh30cejlp1tkkbki))/OData/OData.svc",
+	uriTable: [],
+	create: function() {
 		this.inherited(arguments);
-		OData.read(
-			this.url + metadata, 
-			enyo.bind(this,"processResults"), 
-			enyo.bind(this,"processError"),
-			OData.metadataHandler
-		);
-	},
-	
-	processResults : function(data) {	
-		OData.defaultMetadata.push(data);
-		this.metadata = data;
-		var text = "var metadata = " + enyo.json.stringify(data) + ";";
-		this.createComponent({
-			name: 'metadataInfo',
-			tag: 'p',
-			container: this.$.metadataOdata,
-			content: text,
-			fit: true,
-			touch: true,
-			style: 'height:300px; overflow:scroll;'
-		});
-		if (data.dataServices.schema[0].entityContainer)
+		if(typeof(Storage)!=="undefined")
 		{
-			enyo.forEach(data.dataServices.schema[0].entityContainer[0].entitySet, this.addEntityButton, this);
-		} else if (data.dataServices.schema[1].entityContainer){
-			enyo.forEach(data.dataServices.schema[1].entityContainer[0].entitySet, this.addEntityButton, this);
+			if (sessionStorage.uris) {
+				this.uriString = sessionStorage.uris;
+				this.uriTable = this.uriString.split(',');
+			} else {
+				sessionStorage.uris = this.uriStandard;
+				this.uriTable = this.uriStandard;
+			}
+		} else {
+			this.uriTable = this.uriStandard;
 		}
-		this.$.metadataOdata.render();
+		this.$.uriList.setCount(this.uriTable.length);
+		this.$.uriList.refresh();
 	},
 	
-	addEntityButton : function(entityType) {
-		this.createComponent({
-			kind: 'onyx.Button',
-			container: this.$.metadataOdata,
-			content: entityType.name,
-			entityTypeInfo: entityType,
-			ontap: "entitySelected",
-			style: "background-color: purple; color: #F1F1F1; margin: 10px;"
-		});
-		this.$.metadataOdata.render();
+	setupItem: function(inSender, inEvent) {
+		// this is the row we're setting up	
+		this.$.uriList.getControls();
+		var i = inEvent.index;
+		var n = this.uriTable[i];
+		// apply selection style if inSender (the list) indicates that this row is selected.
+		this.$.item.addRemoveClass("list-sample-selected", inSender.isSelected(i));
+		this.$.uri.setContent(n);
 	},
 	
-	processError : function(err) {	
-		enyo.log(err);
+	newUri: function(inSender, inEvent) {
+		if(typeof(Storage)!=="undefined")
+		{
+			if (sessionStorage.uris) {
+				sessionStorage.uris = this.uriString +',' +this.$.other.getValue();
+				this.uriString = sessionStorage.uris;
+				this.uriTable = sessionStorage.uris.split(',');
+				this.$.uriList.setCount(this.uriTable.length);
+				this.$.uriList.refresh();
+			} else {
+				this.uriString = this.uriString + ',' +this.$.other.getValue();
+				this.uriTable = this.uriString.split(',');
+				this.$.uriList.setCount(this.uriTable.length);
+				this.$.uriList.refresh();				
+			}
+		}
 	},
 	
-	entitySelected:function(inSender,inEvent){
-		this.doEntitySelected({entityType: inEvent.originator.entityTypeInfo});
+	uriSelected:  function(inSender, inEvent) {
+		this.doUriSelected({uri: this.uriTable[inEvent.index]});
 	}
-
+	
 });

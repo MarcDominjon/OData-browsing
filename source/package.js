@@ -8,5 +8,6 @@ enyo.depends(
 	"metadata.js",
 	"entity.js",
 	"element.js",
-	"elements.js"
+	"elements.js",
+	"uriChooser.js"
 );

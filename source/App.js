@@ -2,26 +2,39 @@ enyo.kind({
 	name: "App",
 	kind: "enyo.Panels",
 	classes:"panels",
-	style: "width:90%; height: 100%;",
 	arrangerKind:"CardArranger",
 	published: {url : '', count : 0, head: ""},
 	handlers: {
 		onEntitySelected:"entitySelected",
 		onElementSelected:"elementSelected",
 		onLinkSelected:"linkSelected",
+		onUriSelected: "browseService",
 		onBack:"goBack"
 	},
+	components: [{kind: 'uriChooser', name: 'uri'}],
 	
 	create : function() {
 		this.inherited(arguments);
-		this.createComponent({
+		/*this.createComponent({
 			kind: 'metadata',
 			container: this,
 			url: this.url
 		});
+		this.setIndex(this.count++);*/
 		this.setIndex(this.count++);
 	},
 	
+	browseService: function(inSender,inEvent){
+		this.url = inEvent.uri;
+		this.createComponent({
+			kind: 'metadata',
+			container: this,
+			url: inEvent.uri
+		});
+		this.render();
+		this.reflow();
+		this.setIndex(this.count++);
+	},
 	
 	entitySelected:function(inSender,inEvent){
 		this.fetchEntities(inEvent.entityType);
@@ -106,6 +119,8 @@ enyo.kind({
 	},
 	
 	processError : function(err) {	
-		enyo.log(err);
+		this.log(err);
+		alert('Problem with the OData service.');
+		this.goBack();
 	}
 });
