@@ -14,7 +14,7 @@
 	</head>
 	<body>
 		<script>
-			OData.read(
+			/*OData.read(
 				//"http://services.odata.org/Northwind/Northwind.svc/Order_Details(OrderID=10248,ProductID=11)", 
 				//"http://services.odata.org/OData/OData.svc/Categories?$expand=Products/Supplier",
 				"http://services.odata.org/Northwind/Northwind.svc/Categories?$expand=Products/Order_Details",
@@ -24,7 +24,18 @@
 				function(err) {
 					enyo.log(err);
 				}
-			);
+			);*/
+			var patt = /\((.*?)\)/g;
+			var str = "http://services.odata.org/Northwind/Northwind.svc/Categories(2)/Order_Details(3)";
+			var matches = str.match(patt);
+			str.search(matches[0]);
+			enyo.log(str.search(matches[0]));
+			while (matches.length > 1){
+				matches.shift();
+			}
+			str.search(matches[0]);
+			enyo.log(str.search(matches[0]));
+			enyo.log(str.search('(3)'));
 		</script>
 	</body>
 </html>

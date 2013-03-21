@@ -9,5 +9,6 @@ enyo.depends(
 	"entity.js",
 	"element.js",
 	"elements.js",
-	"uriChooser.js"
+	"uriChooser.js",
+	"odataPanel.js"
 );

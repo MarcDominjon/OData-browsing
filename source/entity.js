@@ -7,6 +7,7 @@ enyo.kind({
 	},
 	events:{
 		onElementSelected: "",
+		onElementSelectedApp: "",
 		onBack: ""
 	},
 	components:[
@@ -40,7 +41,7 @@ enyo.kind({
 		enyo.forEach(
 			refProperty, 
 			function (refProperty) {
-				content = content + refProperty.name + ': ' + element[refProperty.name] + ' ' 
+				content = content + refProperty.name + '=' + element[refProperty.name] + ',' 
 			},
 			this
 		);
@@ -73,6 +74,7 @@ enyo.kind({
 	
 	elementSelected:function(inSender,inEvent){
 		this.doElementSelected({element: inEvent.originator});
+		this.doElementSelectedApp({element: inEvent.originator});
 	},
 	
 	goBack:function(inSender,inEvent){

@@ -8,6 +8,7 @@ enyo.kind({
 	},
 	events:{
 		onLinkSelected: "",
+		onLinkSelectedApp: "",
 		onBack:""
 	},
 	
@@ -23,7 +24,7 @@ enyo.kind({
 					enyo.forEach(
 						refProperty, 
 						function (refProperty) {
-							content = content + refProperty.name + ': ' + dataElement[refProperty.name] + ' ' 
+							content = content + refProperty.name + '=' + dataElement[refProperty.name] + ',' 
 						},
 						this
 					);
@@ -42,7 +43,7 @@ enyo.kind({
 			enyo.forEach(
 				refProperty, 
 				function (refProperty) {
-					content = content + refProperty.name + ': ' + this.results[refProperty.name] + ' ' 
+					content = content + refProperty.name + '=' + this.results[refProperty.name] + ',' 
 				},
 				this
 			);

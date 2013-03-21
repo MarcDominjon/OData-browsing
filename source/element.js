@@ -7,6 +7,7 @@ enyo.kind({
 	},
 	events:{
 		onLinkSelected: "",
+		onLinkSelectedApp: "",
 		onBack:""
 	},
 	components:[
@@ -60,6 +61,7 @@ enyo.kind({
 	
 	linkSelected:function(inSender,inEvent){
 		this.doLinkSelected({element: inEvent.originator});
+		this.doLinkSelectedApp({element: inEvent.originator});
 	},
 
 	goBack:function(inSender,inEvent){

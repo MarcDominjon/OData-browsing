@@ -11,6 +11,7 @@ enyo.kind({
 		
 	events: {
 		onEntitySelected:"",
+		onEntitySelectedApp:"",
 		onBack: ""
 	},
 	
@@ -68,6 +69,7 @@ enyo.kind({
 	
 	entitySelected:function(inSender,inEvent){
 		this.doEntitySelected({entityType: inEvent.originator.entityTypeInfo});
+		this.doEntitySelectedApp({entityType: inEvent.originator.entityTypeInfo});
 	},
 	
 	goBack:function(inSender,inEvent){

@@ -1,126 +1,85 @@
 enyo.kind({
 	name: "App",
-	kind: "enyo.Panels",
-	classes:"panels",
-	arrangerKind:"CardArranger",
-	published: {url : '', count : 0, head: ""},
+	kind: "FittableRows",
+	classes: "enyo-fit",
+	published: {request : ''},
 	handlers: {
-		onEntitySelected:"entitySelected",
-		onElementSelected:"elementSelected",
-		onLinkSelected:"linkSelected",
-		onUriSelected: "browseService",
+		onEntitySelectedApp:"addUriEntity",
+		onElementSelectedApp:"addUriElement",
+		onLinkSelectedApp:"addUriLink",
+		onUriSelectedApp: "addUriRoot",
 		onBack:"goBack"
 	},
-	components: [{kind: 'uriChooser', name: 'uri'}],
+	components: [
+		{kind: "onyx.Toolbar", components: [
+			{kind: "onyx.InputDecorator", components: [
+				{kind: "onyx.Input", name: "requestInput", placeholder: "Request in construction here.", style: " color: black; width: 100%;", type: "url"}
+			], style: "margin: 10px;  background-color: white; width: 95%;"},
+		]},
+		{kind: "odataPanel", name: "browsing", style: "width: 100%; height: 100%"}
+	],
 	
 	create : function() {
-		this.inherited(arguments);
-		/*this.createComponent({
-			kind: 'metadata',
-			container: this,
-			url: this.url
-		});
-		this.setIndex(this.count++);*/
-		this.setIndex(this.count++);
-	},
-	
-	browseService: function(inSender,inEvent){
-		this.url = inEvent.uri;
-		this.createComponent({
-			kind: 'metadata',
-			container: this,
-			url: inEvent.uri
-		});
+		this.inherited(arguments);	
 		this.render();
-		this.reflow();
-		this.setIndex(this.count++);
 	},
 	
-	entitySelected:function(inSender,inEvent){
-		this.fetchEntities(inEvent.entityType);
+	addUriRoot: function(inSender, inEvent) {
+		this.request = inEvent.uri;
+		this.$.requestInput.setValue(this.request);
+		this.$.requestInput.render();
 	},
 	
-	elementSelected:function(inSender,inEvent){
-		this.createComponent({
-			kind: 'element',
-			container: this,
-			properties: inEvent.element.detail,
-			identification: inEvent.element.identification
-		});
-		this.reflow();
-		this.setIndex(this.count++);
+	addUriEntity: function(inSender, inEvent) {
+		this.request = this.request + '/' + inEvent.entityType.name;
+		this.$.requestInput.setValue(this.request);
+		this.$.requestInput.render();
 	},
 	
-	fetchEntities : function(entityType) {
-		entityName = entityType.name;
-		OData.read(
-			this.url+ "/" + entityName,
-			enyo.bind(
-				this, 
-				function (data) {
-					this.createComponent({
-						kind: 'entity',
-						container: this,
-						entitySet: entityType,
-						elements: data,
-						style: "background-color: grey; width:100%; height:100%;"
-					});
-					this.reflow();
-					this.setIndex(this.count++);
-					if (data.results && data.results.length == 0) {
-						alert('ND');
-						this.goBack();
-					}
-				}
-			),
-			enyo.bind(this,"processError")
-		);
+	addUriElement: function(inSender, inEvent) {
+		var str = inEvent.element.identification;
+		var table = str.split("");
+		table.pop();
+		str = table.join("");
+		this.request = this.request + '(' + str + ')';
+		this.$.requestInput.setValue(this.request);
+		this.$.requestInput.render();
 	},
 	
-	linkSelected:function(inSender,inEvent){
-		OData.read(
-			inEvent.element.uri,
-			enyo.bind(
-				this, 
-				function (data) {
-					//if (data.results) {
-						this.createComponent({
-							kind: 'elements',
-							container: this,
-							results: data
-						});
-					//}
-					/* else {
-						this.createComponent({
-							kind: 'element',
-							container: this,
-							properties: data
-						});
-					}*/
-					this.reflow();
-					this.setIndex(this.count++);
-					if (data.results && data.results.length == 0) {
-						alert('ND');
-						this.goBack();
-					}
-				}
-			),
-			enyo.bind(this,"processError")
-		);
+	addUriLink: function(inSender, inEvent) {
+		this.request = this.request + '/' + inEvent.element.content;
+		this.$.requestInput.setValue(this.request);
+		this.$.requestInput.render();
 	},
 	
-	goBack:function(inSender,inEvent){
-		var actu = this.getActive();
-		this.previous();
-		if (actu) {
-			actu.destroy();
+	delUriRoot: function(inSender, inEvent) {
+		this.request = ""
+		this.$.requestInput.setValue(this.request);
+		this.$.requestInput.render();
+	},
+	
+	delUriEntity: function(inSender, inEvent) {
+		var uriTable = this.request.split('/');
+		uriTable = uriTable.pop();
+		this.request = uriTable.join('/');
+		this.$.requestInput.setValue(this.request);
+		this.$.requestInput.render();
+	},
+	
+	delUriElement: function(inSender, inEvent) {
+		var patt = /\((.*?)\)/g;
+		var str = this.request;
+		var matches = str.match(patt);
+		while (matches.length > 1){
+			matches.shift();
 		}
-		this.count--;
+		this.request = str.slice(start, str.search(matches[0]));
+		this.$.requestInput.setValue(this.request);
+		this.$.requestInput.render();
 	},
 	
-	processError : function(err) {	
-		this.log(err);
-		alert('Problem with the OData service.');
-		this.goBack();
-	}
+	delUriLink: function(inSender, inEvent) {
+		this.delUriElement();
+		this.delUriEntity();
+	},
 });
