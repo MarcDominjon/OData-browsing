@@ -3,11 +3,13 @@ enyo.kind({
 	style:"background-color: grey;",
 	published:{
 		properties:"",
+		entityType:"",
 		identification: ""
 	},
 	events:{
 		onLinkSelected: "",
 		onLinkSelectedApp: "",
+		onBackElement:"d",
 		onBack:""
 	},
 	components:[
@@ -21,7 +23,19 @@ enyo.kind({
 	
 	create: function(){
 		this.inherited(arguments);
-		this.$.title.setContent(this.identification);
+		if (this.identification == "") {
+			var refProperty = this.findRefProperty(this.entityType);
+			var content = '';
+			enyo.forEach(
+				refProperty, 
+				function (refProperty) {
+					content = content + refProperty.name + '=' + this.properties[refProperty.name] + ',' 
+				},
+				this
+			);
+			this.identification = content;
+		}
+		this.$.title.setContent(this.entityType.name + ': ' + this.identification.slice(0,-1));
 		for (var key in this.properties) {
 			if (this.properties[key] == null) {
 				this.addDetail(key, 'ND');
@@ -52,11 +66,56 @@ enyo.kind({
 			kind: 'onyx.Button',
 			container: this.$.details,
 			content: propertyName,
+			entityType: this.findEntitySet(propertyName),
 			uri: value.__deferred.uri,
 			ontap: "linkSelected",
 			style: "background-color: orange; margin: 10px;"
 		});
 		this.$.details.render();
+	},
+	
+	findEntitySet: function(entityName) {
+		var metadata = OData.defaultMetadata[0];
+		var namespace = OData.defaultMetadata[0].dataServices.schema[0].namespace;
+		var entity = "";
+		if (metadata.dataServices.schema[0].entityContainer)
+		{
+			enyo.forEach(
+				metadata.dataServices.schema[0].entityContainer[0].entitySet, 
+				function (entitySet) {
+					if(entitySet.name == entityName || entitySet.entityType == namespace + '.' + entityName) {
+						entity = entitySet;
+					}
+				},
+				this
+			);
+		} else if (metadata.dataServices.schema[1].entityContainer){
+			enyo.forEach(
+				metadata.dataServices.schema[1].entityContainer[0].entitySet, 
+				function (entitySet) {
+					if(entitySet.name == entityName || entitySet.entityType == namespace + '.' + entityName) {
+						entity = entitySet;
+					}
+				}, 
+				this
+			);
+		}
+		return entity;
+	},
+	
+	findRefProperty : function(entitySet) {
+		var refProperty = [];
+		var namespace = OData.defaultMetadata[0].dataServices.schema[0].namespace;
+		enyo.forEach(
+			OData.defaultMetadata[0].dataServices.schema[0].entityType, 
+			function (entityType) {
+				if (namespace + '.' + entityType.name == entitySet.entityType) {
+					refProperty = entityType.key.propertyRef;
+				}
+			},
+			this
+		);
+		return refProperty;
 	},
 	
 	linkSelected:function(inSender,inEvent){
@@ -65,6 +124,7 @@ enyo.kind({
 	},
 
 	goBack:function(inSender,inEvent){
+		this.doBackElement();
 		this.doBack();
 	}
 

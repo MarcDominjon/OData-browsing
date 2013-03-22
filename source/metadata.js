@@ -12,7 +12,8 @@ enyo.kind({
 	events: {
 		onEntitySelected:"",
 		onEntitySelectedApp:"",
-		onBack: ""
+		onBack: "",
+		onBackRoot:""
 	},
 	
 	create : function() {
@@ -31,7 +32,6 @@ enyo.kind({
 	processResults : function(data) {
 		OData.defaultMetadata.push(data);
 		this.metadata = data;
-		this.log(data);
 		var text = "var metadata = " + enyo.json.stringify(data,null,2) + ";";
 		this.createComponent({
 			name: 'metadataInfo',
@@ -73,6 +73,7 @@ enyo.kind({
 	},
 	
 	goBack:function(inSender,inEvent){
+		this.doBackRoot();
 		this.doBack();
 	}
 

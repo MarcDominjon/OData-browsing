@@ -8,7 +8,9 @@ enyo.kind({
 		onElementSelectedApp:"addUriElement",
 		onLinkSelectedApp:"addUriLink",
 		onUriSelectedApp: "addUriRoot",
-		onBack:"goBack"
+		onBackElement:"delUriElement",
+		onBackEntity:"delUriEntity",
+		onBackRoot:"delUriRoot"
 	},
 	components: [
 		{kind: "onyx.Toolbar", components: [
@@ -60,26 +62,26 @@ enyo.kind({
 	
 	delUriEntity: function(inSender, inEvent) {
 		var uriTable = this.request.split('/');
-		uriTable = uriTable.pop();
+		uriTable.pop();
 		this.request = uriTable.join('/');
 		this.$.requestInput.setValue(this.request);
 		this.$.requestInput.render();
 	},
 	
 	delUriElement: function(inSender, inEvent) {
-		var patt = /\((.*?)\)/g;
 		var str = this.request;
-		var matches = str.match(patt);
-		while (matches.length > 1){
-			matches.shift();
+		if (str.split('').pop() == ')'){
+			var patt = /\((.*?)\)/g;
+			var match= "";
+			var matches = "";
+			while (matches = patt.exec(str)) {
+				match = matches.index;
+			}
+			this.request = str.slice(0, match-1);
+			this.$.requestInput.setValue(this.request);
+			this.$.requestInput.render();
+		} else {
+			this.delUriEntity();
 		}
-		this.request = str.slice(start, str.search(matches[0]));
-		this.$.requestInput.setValue(this.request);
-		this.$.requestInput.render();
-	},
-	
-	delUriLink: function(inSender, inEvent) {
-		this.delUriElement();
-		this.delUriEntity();
-	},
+	}
 });

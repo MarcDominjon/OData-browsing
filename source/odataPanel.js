@@ -11,6 +11,9 @@ enyo.kind({
 		onUriSelected: "browseService",
 		onBack:"goBack"
 	},
+	events:{
+		onBackEntity:""
+	},
 	components: [{kind: 'uriChooser', name: 'uri'}],
 	
 	create : function() {
@@ -45,6 +48,7 @@ enyo.kind({
 			kind: 'element',
 			container: this,
 			properties: inEvent.element.detail,
+			entityType: inEvent.element.entitySet,
 			identification: inEvent.element.identification
 		});
 		this.reflow();
@@ -52,7 +56,7 @@ enyo.kind({
 	},
 	
 	fetchEntities : function(entityType) {
-		entityName = entityType.name;
+		var entityName = entityType.name;
 		OData.read(
 			this.url+ "/" + entityName,
 			enyo.bind(
@@ -70,6 +74,7 @@ enyo.kind({
 					if (data.results && data.results.length == 0) {
 						alert('ND');
 						this.goBack();
+						this.doBackEntity();
 					}
 				}
 			),
@@ -83,25 +88,29 @@ enyo.kind({
 			enyo.bind(
 				this, 
 				function (data) {
-					//if (data.results) {
+					if (data.results) {
 						this.createComponent({
-							kind: 'elements',
+							kind: 'entity',
 							container: this,
-							results: data
+							entitySet: inEvent.element.entityType,
+							elements: data,
+							style: "background-color: grey; width:100%; height:100%;"
 						});
-					//}
-					/* else {
+					} else {
 						this.createComponent({
 							kind: 'element',
 							container: this,
-							properties: data
+							properties: data,
+							entityType: inEvent.element.entityType,
+							identification: inEvent.element.identification
 						});
-					}*/
+					}
 					this.reflow();
 					this.setIndex(this.count++);
 					if (data.results && data.results.length == 0) {
 						alert('ND');
 						this.goBack();
+						this.doBackEntity();
 					}
 				}
 			),

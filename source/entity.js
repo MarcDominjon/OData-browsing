@@ -8,6 +8,7 @@ enyo.kind({
 	events:{
 		onElementSelected: "",
 		onElementSelectedApp: "",
+		onBackEntity:"",
 		onBack: ""
 	},
 	components:[
@@ -28,10 +29,14 @@ enyo.kind({
 			fit: true,
 			style: "width:100%; height:100%; background-color: grey;"
 		});
-		enyo.forEach(
-			this.elements.results, 
-			enyo.bind(this, this.addElementButton)
-		);
+		if (this.elements.results) {
+			enyo.forEach(
+				this.elements.results, 
+				enyo.bind(this, this.addElementButton)
+			);
+		} else {
+			this.addElementButton(this.elements);
+		}
 		this.render();
 	},
 	
@@ -48,9 +53,10 @@ enyo.kind({
 		this.createComponent({
 			kind: 'onyx.Button',
 			container: this.$[this.entitySet.name],
-			content: content,
+			content: content.slice(0, -1),
 			detail: element,
 			identification: content,
+			entitySet: this.entitySet,
 			ontap: "elementSelected",
 			style: "background-color: purple; color: #F1F1F1; margin: 10px;"
 		});
@@ -78,6 +84,7 @@ enyo.kind({
 	},
 	
 	goBack:function(inSender,inEvent){
+		this.doBackEntity();
 		this.doBack();
 	}
 
