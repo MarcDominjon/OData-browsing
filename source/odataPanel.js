@@ -2,6 +2,7 @@ enyo.kind({
 	name: "odataPanel",
 	kind: "enyo.Panels",
 	classes:"panels",
+	draggable: false,
 	arrangerKind:"CardArranger",
 	published: {url : '', count : 0, head: ""},
 	handlers: {

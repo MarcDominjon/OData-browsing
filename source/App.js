@@ -1,24 +1,16 @@
 enyo.kind({
 	name: "App",
-	kind: "FittableRows",
+	kind: "enyo.Panels",
+	draggable: false,
 	classes: "enyo-fit",
 	published: {request : ''},
 	handlers: {
-		onEntitySelectedApp:"addUriEntity",
-		onElementSelectedApp:"addUriElement",
-		onLinkSelectedApp:"addUriLink",
-		onUriSelectedApp: "addUriRoot",
-		onBackElement:"delUriElement",
-		onBackEntity:"delUriEntity",
-		onBackRoot:"delUriRoot"
+		onQuerySelected:"goQueryMode",
+		onRequestSelected:"goRequestMode"
 	},
 	components: [
-		{kind: "onyx.Toolbar", components: [
-			{kind: "onyx.InputDecorator", components: [
-				{kind: "onyx.Input", name: "requestInput", placeholder: "Request in construction here.", style: " color: black; width: 100%;", type: "url"}
-			], style: "margin: 10px;  background-color: white; width: 95%;"},
-		]},
-		{kind: "odataPanel", name: "browsing", style: "width: 100%; height: 100%"}
+		{kind: "requestPanel", name: "requestP", style: "width: 100%; height: 100%"},
+		{kind: "queryPanel", name: "query", style: "width: 100%; height: 100%"}
 	],
 	
 	create : function() {
@@ -26,62 +18,16 @@ enyo.kind({
 		this.render();
 	},
 	
-	addUriRoot: function(inSender, inEvent) {
-		this.request = inEvent.uri;
-		this.$.requestInput.setValue(this.request);
-		this.$.requestInput.render();
+	goQueryMode: function(inSender, inEvent) {
+		this.request = inEvent.request;
+		this.$.query.setRequest(this.request);
+		this.next();
 	},
 	
-	addUriEntity: function(inSender, inEvent) {
-		this.request = this.request + '/' + inEvent.entityType.name;
-		this.$.requestInput.setValue(this.request);
-		this.$.requestInput.render();
-	},
+	goRequestMode: function(inSender, inEvent) {
+		this.request = inEvent.request;
+		this.$.requestP.setRequest(this.request);
+		this.previous();
+	}	
 	
-	addUriElement: function(inSender, inEvent) {
-		var str = inEvent.element.identification;
-		var table = str.split("");
-		table.pop();
-		str = table.join("");
-		this.request = this.request + '(' + str + ')';
-		this.$.requestInput.setValue(this.request);
-		this.$.requestInput.render();
-	},
-	
-	addUriLink: function(inSender, inEvent) {
-		this.request = this.request + '/' + inEvent.element.content;
-		this.$.requestInput.setValue(this.request);
-		this.$.requestInput.render();
-	},
-	
-	delUriRoot: function(inSender, inEvent) {
-		this.request = ""
-		this.$.requestInput.setValue(this.request);
-		this.$.requestInput.render();
-	},
-	
-	delUriEntity: function(inSender, inEvent) {
-		var uriTable = this.request.split('/');
-		uriTable.pop();
-		this.request = uriTable.join('/');
-		this.$.requestInput.setValue(this.request);
-		this.$.requestInput.render();
-	},
-	
-	delUriElement: function(inSender, inEvent) {
-		var str = this.request;
-		if (str.split('').pop() == ')'){
-			var patt = /\((.*?)\)/g;
-			var match= "";
-			var matches = "";
-			while (matches = patt.exec(str)) {
-				match = matches.index;
-			}
-			this.request = str.slice(0, match-1);
-			this.$.requestInput.setValue(this.request);
-			this.$.requestInput.render();
-		} else {
-			this.delUriEntity();
-		}
-	}
 });
