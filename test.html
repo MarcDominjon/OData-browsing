@@ -15,16 +15,64 @@
 	<body>
 		<script>
 			OData.read(
+				//"http://services.odata.org/Northwind/Northwind.svc/$metadata",
+				"http://services.odata.org/OData/OData.svc/$metadata",
 				//"http://services.odata.org/Northwind/Northwind.svc/Order_Details(OrderID=10248,ProductID=11)", 
 				//"http://services.odata.org/OData/OData.svc/Categories?$expand=Products/Supplier",
-				"http://services.odata.org/Northwind/Northwind.svc/Categories?$expand=Products/Order_Details",
+				//"http://services.odata.org/Northwind/Northwind.svc/Categories?$expand=Products/Order_Details",
+				//"http://services.odata.org/OData/OData.svc/Suppliers(1)?$select=Products",//&$expand=Products",
+				//"http://services.odata.org/Northwind/Northwind.svc/Categories(1)/$links/Products",
 				function(data) {
 					enyo.log(data);
 				}, 
 				function(err) {
 					enyo.log(err);
-				}
+				},
+				OData.metadataHandler
 			);
+			/*
+			var patt = /\((.*?)\)/g;
+			var str = "http://services.odata.org/Northwind/Northwind.svc/Categories(2)/Order_Details(3)";
+			var matches = str.match(patt);
+			str.search(matches[0]);
+			enyo.log(str.search(matches[0]));
+			while (matches.length > 1){
+				matches.shift();
+			}
+			str.search(matches[0]);
+			enyo.log(str.search(matches[0]));
+			enyo.log(str.search('(3)'));
+			*/
+			enyo.kind({
+				name: "menuTest",
+				components: [
+					{kind: "onyx.Toolbar", classes: "onyx-menu-toolbar", components: [
+						{kind: "onyx.MenuDecorator", selectable: true, onSelect: "itemSelected", components: [
+							{content: "Options Menu"},
+							{kind: "onyx.Menu", name: "optionMenu", components: [
+								{classes: "onyx-menu-divider"},
+								{kind: "enyo.Control", content: '$format', ontap: "itemSelected"},
+								{name: "columnsDrawer", orient: "v", kind: "onyx.Drawer", open: false, components: [
+									{kind: 'onyx.MenuItem', content: "Atom"},
+									{kind: 'onyx.MenuItem', content: "Xml"},
+									{kind: 'onyx.MenuItem', content: "Json"}
+								]},
+								{classes: "onyx-menu-divider"}
+							]}
+						]}
+					]}
+				],
+				create: function() {
+					this.inherited(arguments);
+					this.render();
+				},
+				itemSelected: function() {
+					this.$.columnsDrawer.setOpen(!this.$.columnsDrawer.open);
+					return true;
+				},
+			});
+			new menuTest().renderInto(document.body);
+			
 		</script>
 	</body>
 </html>

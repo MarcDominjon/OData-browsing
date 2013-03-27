@@ -11,7 +11,9 @@ enyo.kind({
 		
 	events: {
 		onEntitySelected:"",
-		onBack: ""
+		onEntitySelectedApp:"",
+		onBack: "",
+		onBackRoot:""
 	},
 	
 	create : function() {
@@ -30,16 +32,14 @@ enyo.kind({
 	processResults : function(data) {
 		OData.defaultMetadata.push(data);
 		this.metadata = data;
-		this.log(data);
-		var text = "var metadata = " + enyo.json.stringify(data,null,2) + ";";
+		var text = "var metadata = " + enyo.json.stringify(data,null,'\t') + ";";
 		this.createComponent({
 			name: 'metadataInfo',
-			tag: 'p',
+			kind: 'enyo.Scroller',
 			container: this.$.metadataOdata,
-			content: text,
 			fit: true,
-			touch: true,
-			style: 'height:300px; overflow:scroll;'
+			style: 'height:300px;',
+			components: [{tag: 'pre', content: text}]
 		});
 		if (data.dataServices.schema[0].entityContainer)
 		{
@@ -68,9 +68,11 @@ enyo.kind({
 	
 	entitySelected:function(inSender,inEvent){
 		this.doEntitySelected({entityType: inEvent.originator.entityTypeInfo});
+		this.doEntitySelectedApp({entityType: inEvent.originator.entityTypeInfo});
 	},
 	
 	goBack:function(inSender,inEvent){
+		this.doBackRoot();
 		this.doBack();
 	}
 

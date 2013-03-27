@@ -1,7 +1,7 @@
 enyo.kind({
 	name: "uriChooser",
 	classes: "list-sample enyo-fit",
-	events: {onUriSelected: "", onNewUri: ""},
+	events: {onUriSelected: "", onNewUri: "", onUriSelectedApp: ""},
 	handlers: {onAddUri: "addUri"},
 	components: [
 		{name: "uriList", kind: "enyo.List", multiSelect: false, classes: "enyo-fit list-sample-list", onSetupItem: "setupItem", components: [
@@ -10,7 +10,7 @@ enyo.kind({
 			]}
 		]},
 		{kind: "onyx.InputDecorator", components: [
-				{kind: "onyx.Input", name: "other", placeholder: "Enter URI here"}
+				{kind: "onyx.Input", name: "other", placeholder: "Enter URI here", style: "min-width: 300px;"}
 		], style: "margin: 10px;"},
 		{kind: 'onyx.Button', content: 'Add a new uri',	ontap: "newUri", style: "background-color: brown; color: #F1F1F1; margin: 10px;"}
 	],
@@ -69,6 +69,7 @@ enyo.kind({
 	
 	uriSelected:  function(inSender, inEvent) {
 		this.doUriSelected({uri: this.uriTable[inEvent.index]});
+		this.doUriSelectedApp({uri: this.uriTable[inEvent.index]});
 	}
 	
 });

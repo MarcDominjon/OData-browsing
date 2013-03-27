@@ -8,6 +8,10 @@ enyo.depends(
 	"metadata.js",
 	"entity.js",
 	"element.js",
-	"elements.js",
-	"uriChooser.js"
+	"uriChooser.js",
+	"odataPanel.js",
+	"requestPanel.js",
+	"queryPanel.js",
+	"propertiesList.js",
+	"queryFilter.js"
 );
