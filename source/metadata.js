@@ -21,6 +21,7 @@ enyo.kind({
 		this.inherited(arguments);
 		this.$.title.setContent("Metadata and entitySets of: " + this.url);
 		OData.defaultMetadata = [];
+		//OData.defaultHttpClient.enableJsonpCallback = true;
 		OData.read(
 			this.url + metadata, 
 			enyo.bind(this,"processResults"), 
@@ -31,6 +32,7 @@ enyo.kind({
 	
 	processResults : function(data) {
 		OData.defaultMetadata.push(data);
+		this.parent.parent.$.queryMode.setShowing(true);
 		this.metadata = data;
 		var text = "var metadata = " + enyo.json.stringify(data,null,'\t') + ";";
 		this.createComponent({
@@ -38,7 +40,7 @@ enyo.kind({
 			kind: 'enyo.Scroller',
 			container: this.$.metadataOdata,
 			fit: true,
-			style: 'height:300px;',
+			style: 'height:500px;',
 			components: [{tag: 'pre', content: text}]
 		});
 		if (data.dataServices.schema[0].entityContainer)

@@ -13,5 +13,7 @@ enyo.depends(
 	"requestPanel.js",
 	"queryPanel.js",
 	"propertiesList.js",
-	"queryFilter.js"
+	"queryFilter.js",
+	"autoComplete.js",
+	"importFunctions.js"
 );

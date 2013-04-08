@@ -20,7 +20,7 @@ enyo.kind({
 			{kind: "onyx.InputDecorator", components: [
 				{kind: "onyx.Input", name: "requestInput", placeholder: "Request in construction here.", style: " color: black; width: 100%;", type: "url"}
 			], style: "margin: 10px;  background-color: white; width: 85%;"},
-			{kind: "onyx.Button", name:"queryMode",content: "Query Mode", showing:true, ontap:"goQuery", style: "background-color: cyan; color: purple;"}
+			{kind: "onyx.Button", name:"queryMode",content: "Query Mode", showing:false, ontap:"goQuery", style: "background-color: cyan; color: purple;"}
 		]},
 		{kind: "odataPanel", name: "browsing", style: "width: 100%; height: 100%"}
 	],
@@ -81,7 +81,7 @@ enyo.kind({
 			while (matches = patt.exec(str)) {
 				match = matches.index;
 			}
-			this.request = str.slice(0, match-1);
+			this.request = str.slice(0, match);
 			this.$.requestInput.setValue(this.request);
 			this.$.requestInput.render();
 		} else {

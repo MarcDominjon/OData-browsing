@@ -14,9 +14,11 @@
 	</head>
 	<body>
 		<script>
-			OData.read(
-				//"http://services.odata.org/Northwind/Northwind.svc/$metadata",
-				"http://services.odata.org/OData/OData.svc/$metadata",
+			/*OData.read(
+				"http://services.odata.org/Northwind/Northwind.svc/$metadata",
+				//'http://ent112.sharepoint.hp.com/teams/enyo-odata/SitePages/Home.aspx/_vti_bin/listdata.svc/$metadata',
+				//'http://ent112.sharepoint.hp.com/teams/enyo-odata/_vti_bin/listdata.svc/$metadata',
+				//"http://services.odata.org/OData/OData.svc/$metadata",
 				//"http://services.odata.org/Northwind/Northwind.svc/Order_Details(OrderID=10248,ProductID=11)", 
 				//"http://services.odata.org/OData/OData.svc/Categories?$expand=Products/Supplier",
 				//"http://services.odata.org/Northwind/Northwind.svc/Categories?$expand=Products/Order_Details",
@@ -29,7 +31,7 @@
 					enyo.log(err);
 				},
 				OData.metadataHandler
-			);
+			);*/
 			/*
 			var patt = /\((.*?)\)/g;
 			var str = "http://services.odata.org/Northwind/Northwind.svc/Categories(2)/Order_Details(3)";
@@ -43,6 +45,7 @@
 			enyo.log(str.search(matches[0]));
 			enyo.log(str.search('(3)'));
 			*/
+			/*
 			enyo.kind({
 				name: "menuTest",
 				components: [
@@ -72,7 +75,342 @@
 				},
 			});
 			new menuTest().renderInto(document.body);
+			*/
+			/*enyo.kind({
+				name: "autoCompleteTest",
+				handlers: {
+					onReturnPressed: 'returnPressed',
+					onEscPressed: 'escPressed',
+					onUpPressed: 'upPressed',
+					onDownPressed: 'downPressed',
+					onInsertSuggestion: 'insertSuggestion'
+				},
+				fit: false,
+				
+				components: [
+					{kind: "autoCompleteInput"},
+					{kind: 'autoCompletePopup', name: 'popup'}
+				],
+				
+				returnPressed: function(inSender, inEvent) {
+					this.$.popup.keyReturn();
+					return true;
+				},
+				
+				escPressed: function(inSender, inEvent) {
+					this.$.popup.keyEscape();
+					return true;
+				},
+				
+				upPressed: function(inSender, inEvent) {
+					this.$.popup.cursorUp();
+					return true;
+				},
+				
+				downPressed: function(inSender, inEvent) {
+					this.$.popup.cursorDown();
+					return true;
+				},
+				
+				insertSuggestion: function(inSender, inEvent) {
+					this.$.autoCompleteInput.completeInput(inEvent.suggestion);
+					return true;
+				}
+			});
 			
+			enyo.kind({
+				name: "autoCompleteInput",
+				events: {
+					onReturnPressed: '',
+					onEscPressed: '',
+					onUpPressed: '',
+					onDownPressed: ''
+				},
+				components: [
+					{kind: "onyx.InputDecorator", components: [
+						{kind: "onyx.Input", name: "autoInput", disabled: false, placeholder: "Request in construction here.", 
+						ontap: 'inputTapped',oninput: 'autoComplete', onkeydown: 'keyPressed', style: "width: 100%"}
+					], style: "margin: 10px;  background-color: white; display:inline-block; "},
+					{name: "invisibleInput", classes: 'enyo-input onyx.input', style: 'display:inline-block; visibility: hidden; margin-right: 0; border-right: 0; padding-right: 0;'}
+				],
+				
+				bases: [
+					{notation: 'substringof(', name: 'bool substringof(string po, string p1))'},
+					{notation: 'endswith(', name: 'bool endswith(string p0, string p1)'},
+					{notation: 'startswith(', name: 'bool startswith(string p0, string p1)'},
+					{notation: 'length(', name: 'int length(string p0)'},
+					{notation: 'indexof(', name: 'int indexof(string p0, string p1)'},
+					{notation: 'replace(', name: 'string replace(string p0, string find, string replace)'},
+					{notation: 'substring(', name: 'string substring(string p0, int pos)'},
+					{notation: 'substring(', name: 'string substring(string p0, int pos, int length)'},
+					{notation: 'tolower(', name: 'string tolower(string p0)'},
+					{notation: 'toupper(', name: 'string toupper(string p0)'},
+					{notation: 'trim(', name: 'string trim(string p0)'},
+					{notation: 'concat(', name: 'string concat(string p0, string p1)'},
+					{notation: 'day(', name: 'int day(DateTime p0)'},
+					{notation: 'hour(', name: 'int hour(DateTime p0)'},
+					{notation: 'minute(', name: 'int minute(DateTime p0)'},
+					{notation: 'month(', name: 'int month(DateTime p0)'},
+					{notation: 'second(', name: 'int second(DateTime p0)'},
+					{notation: 'year(', name: 'int year(DateTime p0)'},
+					{notation: 'round(', name: 'double round(double p0)'},
+					{notation: 'round(', name: 'decimal round(decimal p0)'},
+					{notation: 'floor(', name: 'double floor(double p0)'},
+					{notation: 'floor(', name: 'decimal floor(decimal p0)'},
+					{notation: 'ceiling(', name: 'double ceiling(double p0)'},
+					{notation: 'ceiling(', name: 'decimal ceiling(decimal p0)'},
+					{notation: 'isOf(', name: 'bool IsOf(type p0)'},
+					{notation: 'isOf(', name: 'bool IsOf(expression p0, type p1)'}
+				],
+				
+				suggestions : [],
+				
+				previousCursor: 0,
+				
+				create: function() {
+					this.inherited(arguments);
+					this.render();
+				},
+				
+				keyPressed: function (inSender, inEvent) {
+					var key = inEvent.keyIdentifier;
+					if (this.owner.$.popup.popupShown) {
+						if(key == 'Enter' || key == 'Up' || key == 'Down' || key == 'U+001B') {
+							inEvent.preventDefault();
+						}
+						switch (key) {
+							case 'Enter':
+								this.doReturnPressed();
+								break;
+							case 'Up':
+								this.doUpPressed();
+								break;
+							case 'Down':
+								this.doDownPressed();
+								break;
+							case 'U+001B':
+								this.doEscPressed();
+								break;
+						}
+						if (key == 'U+0020' && inEvent.ctrlKey == true) {
+							inEvent.preventDefault();
+							this.doEscPressed();
+						} else if (key == 'Left' || key == 'Right' || key == 'End' || key == 'Home' || key == 'PageUp' || key == 'PageDown') {
+							this.doEscPressed();
+						}
+						return true;
+					} else {
+						if (key == 'U+0020' && inEvent.ctrlKey == true) {
+							inEvent.preventDefault();
+							this.autoComplete(inSender, inEvent);
+						}
+					}
+				},
+				
+				autoComplete: function(inSender, inEvent) {
+					this.suggestions = [];
+					
+					var asyncCall = new enyo.Async();
+					asyncCall.go();
+					
+					asyncCall.response(enyo.bind(this,function(inSender, inResponse) {
+						var cursorIndex = this.$.autoInput.eventNode.selectionStart;
+						var textInput = this.$.autoInput.getValue();
+						var cursorIndex = this.$.autoInput.eventNode.selectionStart;//inEvent.srcElement.selectionStart;
+						var length = textInput.length;
+						//if (cursorIndex >= 1 && length >= 2){//(cursorIndex == length - 1 || (cursorIndex == length || ))) {
+						//	cursorIndex += 1;
+						//}
+						
+						//if (this.previousCursor > cursorIndex) {
+						//	cursorIndex -= 1;
+						//}
+						this.previousCursor = cursorIndex;
+						
+						if (textInput.charAt(cursorIndex-1) != ' ' && textInput.length && (textInput.charAt(cursorIndex) == ' ' || textInput.charAt(cursorIndex) == '')) {
+							var lastSpaceIndex = textInput.slice(0, cursorIndex).lastIndexOf(' ');
+							var partial = textInput.slice(lastSpaceIndex + 1, cursorIndex+1).trim();
+							var regexp = new RegExp(partial, 'i');
+							enyo.forEach(
+								this.bases,
+								function (element) {
+									if (element.notation.search(regexp) == 0) {
+										this.suggestions.unshift(element);
+									}
+								},
+								this
+							);
+						}
+						
+						this.log(textInput);
+						this.log(textInput.substring(0, cursorIndex));
+						this.log(textInput.substring(0, cursorIndex).replace(/./g, "\u00a0"));
+						this.log(this.$.invisibleInput);
+						this.$.invisibleInput.setContent(textInput.substring(0, cursorIndex));//.replace(/./g, "\u00a0"));
+						this.log(this.$.invisibleInput.node.offsetWidth);
+						var offsetToCaret = this.$.invisibleInput.node.offsetWidth;
+						this.owner.$.popup.setProperty('posX', this.$.autoInput.eventNode.offsetLeft + offsetToCaret);//cursorIndex*this.$.autoInput.eventNode.size*0.764);
+						this.owner.$.popup.setProperty('posY',this.$.autoInput.eventNode.offsetHeight + this.$.autoInput.eventNode.size + 10);
+						this.owner.$.popup.setProperty('suggestions', this.suggestions);
+					}));
+					
+					
+				},
+				
+				completeInput: function(suggestion) {
+					var input = this.$.autoInput;
+					var textInput = input.getValue();
+					var lastSpace = textInput.slice(0, this.previousCursor).lastIndexOf(' ');
+					if (lastSpace == -1) {
+						var insertion = suggestion + textInput.slice(this.previousCursor);
+					} else {
+						var insertion = textInput.slice(0, lastSpace+1) + suggestion + textInput.slice(this.previousCursor);
+					}
+					input.setValue(insertion);
+					input.eventNode.selectionStart = (lastSpace + 1 + suggestion.length);
+					input.eventNode.selectionEnd= (lastSpace + 1 + suggestion.length);
+				},
+				
+				inputTapped: function(inSender, inEvent) {
+					var input = this.$.autoInput;
+					if (input.hasNode().selectionStart != this.previousCursor) {
+						this.doEscPressed();
+					}
+				}
+			});
+			
+			enyo.kind({
+				name : "autoCompletePopup",
+				kind : "onyx.Popup",
+				centered : false,
+				floating : true,
+				autoDismiss : false,
+				modal : false,
+				published: {
+					suggestions: null,
+					posX: null,
+					posY: null
+				},
+				components : [ {
+					kind : "Select",
+					name : "autocompleteSelect",
+					attributes : {
+						size : 1
+					},
+					onchange : "autocompleteChanged",
+					components : [
+						// options elements will be populated programmatically
+					]
+				} ],
+				events: {
+					onInsertSuggestion: ''
+				},
+				handlers: {
+					onHide: "hideAutocompletePopup"
+				},
+				popupShown: false,
+				
+				
+				create: function() {
+					this.inherited(arguments);
+				},
+				
+				suggestionsChanged: function() {
+					var select = this.$.autocompleteSelect;
+					select.destroyComponents();
+					enyo.forEach(this.suggestions, function(item) {
+						var name = item.name;
+						select.createComponent({content: name});
+					}, this);
+					this.showAutocompletePopup();
+				},
+				
+				showAutocompletePopup: function() {
+					var select = this.$.autocompleteSelect;
+					select.nbEntries = select.controls.length;
+					if (select.nbEntries > 0) {
+						var size = Math.max(2, Math.min(select.nbEntries, 10));
+						select.setAttribute("size", size);
+						select.setSelected(0);
+						select.render();
+						
+						// Position the autocomplete popup
+						this.applyStyle("top", this.posY + "px");
+						this.applyStyle("left", this.posX + "px");
+						this.show();
+						this.popupShown = true;
+					} else {
+						this.hideAutocompletePopup();
+					}
+				},
+				
+				hideAutocompletePopup: function() {
+					this.popupShown = false;
+					this.hide();
+					return true;
+				},
+				
+				cursorUp: function() {
+					if (this.popupShown) {
+						var select = this.$.autocompleteSelect;
+						var selected = select.getSelected() - 1;
+						if (selected < 0) { selected = select.nbEntries - 1;}
+						select.setSelected(selected);
+					}
+				},
+
+				cursorDown: function() {
+					if (this.popupShown) {
+						var select = this.$.autocompleteSelect;
+						var selected = (select.getSelected() + 1) % select.nbEntries;
+						select.setSelected(selected);
+					}
+				},
+
+				keyEscape: function() {
+					this.hideAutocompletePopup();
+				},
+
+				keyReturn: function() {
+					if (this.popupShown) {
+						this.autocompleteChanged();
+						this.hideAutocompletePopup();
+					}
+				},
+				
+				autocompleteChanged: function() {
+					this.hide();
+					var indexSelected = this.$.autocompleteSelect.getSelected();
+					this.doInsertSuggestion({suggestion: this.suggestions[indexSelected].notation});
+				}
+			});*/
+
+			/*new autoComplete().renderInto(document.body);*/
+			/*
+			var request = new enyo.Ajax({
+				url: "http://services.odata.org/Northwind/Northwind.svc/%24metadata",
+				method: "GET",
+				handleAs: "xml",
+				//mimeType: 'application/json;odata=verbose',
+				//headers: {'accept': 'application/json;odata=verbose', 'MaxDataServiceVersion':'3.0'}
+			});
+			request.go();
+			request.response(
+				function(inAsync, inValue){
+					this.log(inAsync, inValue);
+				}
+			);
+			
+			OData.defaultHttpClient.enableJsonpCallback = true;
+			OData.read(
+				"http://services.odata.org/Northwind/Northwind.svc/Products", 
+				function(data) {
+					//enyo.log(data);
+				}, 
+				function(err) {
+					enyo.log(err);
+				}
+			);*/
 		</script>
 	</body>
 </html>

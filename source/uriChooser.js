@@ -3,6 +3,8 @@ enyo.kind({
 	classes: "list-sample enyo-fit",
 	events: {onUriSelected: "", onNewUri: "", onUriSelectedApp: ""},
 	handlers: {onAddUri: "addUri"},
+	uriOk: false,
+	otherUri : '',
 	components: [
 		{name: "uriList", kind: "enyo.List", multiSelect: false, classes: "enyo-fit list-sample-list", onSetupItem: "setupItem", components: [
 			{name: "item", classes: "list-sample-item enyo-border-box", ontap: "uriSelected", components: [
@@ -50,26 +52,78 @@ enyo.kind({
 	},
 	
 	newUri: function(inSender, inEvent) {
-		if(typeof(Storage)!=="undefined")
-		{
-			if (sessionStorage.uris) {
-				sessionStorage.uris = this.uriString +',' +this.$.other.getValue();
-				this.uriString = sessionStorage.uris;
-				this.uriTable = sessionStorage.uris.split(',');
-				this.$.uriList.setCount(this.uriTable.length);
-				this.$.uriList.refresh();
-			} else {
-				this.uriString = this.uriString + ',' +this.$.other.getValue();
-				this.uriTable = this.uriString.split(',');
-				this.$.uriList.setCount(this.uriTable.length);
-				this.$.uriList.refresh();				
-			}
-		}
+		this.otherUri = this.$.other.getValue();
+		this.testUri();
 	},
 	
 	uriSelected:  function(inSender, inEvent) {
 		this.doUriSelected({uri: this.uriTable[inEvent.index]});
 		this.doUriSelectedApp({uri: this.uriTable[inEvent.index]});
-	}
+	},
+	
+	testUri: function() {
+		var metadata = '/$metadata';
+		this.log(this.otherUri);
+		if (this.otherUri.slice(-1) == '/') {
+			this.otherUri = this.otherUri.slice(0,-1);
+		}
+		OData.read(
+			this.otherUri + metadata,
+			enyo.bind(this,'correctUri'),
+			enyo.bind(this,'isSharepointOrNot'),
+			OData.metadataHandler
+		);
+	},
+	
+	correctUri: function(data) {
+		this.log(data);
+		if (!data) {
+			this.log('Arnak');
+			this.notACorrectUri();
+			return;
+		}
+		
+		if(typeof(Storage)!=="undefined")
+		{
+			if (sessionStorage.uris) {
+				sessionStorage.uris = this.uriString + ',' + this.otherUri;
+				this.uriString = sessionStorage.uris;
+				this.uriTable = sessionStorage.uris.split(',');
+			} else {
+				this.uriString = this.uriString + ',' + this.otherUri;
+				this.uriTable = this.uriString.split(',');				
+			}
+			this.$.uriList.setCount(this.uriTable.length);
+			this.$.uriList.refresh();
+		}
+	},
+	
+	isSharepointOrNot: function() {
+		var metadata = '/_vti_bin/listdata.svc/$metadata';
+		OData.read(
+			this.otherUri + metadata,
+			enyo.bind(this,'isSharepoint'),
+			enyo.bind(this,'notACorrectUri'),
+			OData.metadataHandler
+		);
+	},
+	
+	isSharepoint: function(data) {
+		this.otherUri += '/_vti_bin/listdata.svc';
+		this.correctUri(data);
+	},
+	
+	notACorrectUri: function(err) {
+		this.log('Not a correct URI yet.');
+		var uriSplitted = this.otherUri.split('/');
+		if (uriSplitted.length == 1) {
+			alert('This URI does not refer to a valid OData service.');
+			return;
+		} else {
+			uriSplitted.pop();
+			this.otherUri = uriSplitted.join('/');
+		}
+		this.testUri();
+	},
 	
 });
