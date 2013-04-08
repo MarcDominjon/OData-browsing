@@ -5,183 +5,233 @@ enyo.kind({
 	fit: true,
 	events: {onAddToQuery: ""},
 	published: {propertyTable: [], associationTable: [], complexTypeTable: [], entityTypeTable: [], option: ''},
-	components: [
-		{name: "propertyList", kind: "enyo.List", multiSelect: false, style : "min-width: 20%; height: 240px; background-color: white;", onSetupItem: "setupItemProperty", components: [
-			{name: "itemProperty", classes: "list-sample-item enyo-border-box", ontap: "propertySelected", components: [
-				{name: "property"}
-			]}
-		]},
-		{name: "operatorList", kind: "enyo.List", multiSelect: false, style : "min-width: 20%; height: 240px; background-color: white;", onSetupItem: "setupItemOperator", components: [
-			{name: "itemOperator", classes: "list-sample-item enyo-border-box", ontap: "operatorSelected", components: [
-				{name: "operator",notation: ''}
-			]}
-		]},
-		{name: "functionList", kind: "enyo.List", multiSelect: false, style : "min-width: 20%; height: 240px; background-color: white;", onSetupItem: "setupItemFunction", components: [
-			{name: "itemFunction", classes: "list-sample-item enyo-border-box", ontap: "functionSelected", components: [
-				{name: "functions",notation: ''}
+	components: [		
+		{kind: "onyx.Toolbar", classes: "onyx-menu-toolbar", components: [
+			{kind: "enyo.FittableRows", components: [
+				{content: "Premade Items", style: 'padding: 10px;'},
+				{kind: "enyo.FittableColumns",components: [
+					{kind: "onyx.MenuDecorator", selectable: true, onSelect: "metadataSelected", components: [
+						{content: "Metadatas"},
+						{kind: "onyx.Menu", name: "metadataMenu"}
+					]},
+					{kind: "onyx.MenuDecorator", selectable: true, onSelect: "itemSelected", components: [
+						{content: "Operators"},
+						{kind: "onyx.Menu", name: "operatorMenu"}
+					]},
+					{kind: "onyx.MenuDecorator", selectable: true, onSelect: "itemSelected", components: [
+						{content: "Functions"},
+						{kind: "onyx.Menu", name: "functionMenu"}
+					]}
+				]}
 			]}
 		]}
 	],
 	
-	operatorTable: [
-		{notation: 'eq', name: 'Equal'},
-		{notation: 'ne', name: 'Not equal'},
-		{notation: 'gt', name: 'Greater than'}, 
-		{notation: 'ge', name: 'Greater than or equal'},
-		{notation: 'lt', name: 'Less than'},
-		{notation: 'le', name: 'Less than or equal'},
-		{notation: 'and', name: 'Logical and'},
-		{notation: 'or', name: 'Logical or'},
-		{notation: 'not', name: 'Logical negation'},
-		{notation: 'add', name: 'Addition'},
-		{notation: 'sub', name: 'Subtraction'},
-		{notation: 'mul', name: 'Multiplication'},
-		{notation: 'div', name: 'Division'},
-		{notation: 'mod', name: 'Modulo'},
-		{notation: '(', name: 'Open parentheses'},
-		{notation: ')', name: 'Close parentheses'},
-	],
+	tables : [
+		{name: 'metadata', types: ['Properties', 'Associations', 'Entity Types', 'Complex Types']},
+		{name: 'operator', types: ['Logical Operators', 'Arithmetic Operators']},
+		{name: 'function', types: ['String Functions', 'Date Functions', 'Math Functions', 'Type Functions']}
+	],	
+
+	metadataTable: {
+		'Properties': [],
+		'Associations': [],
+		'Entity Types': [],
+		'Complex Types': []
+	},
 	
-	functionTable: [
-		{notation: 'substringof(', name: 'bool substringof(string po, string p1))'},
-		{notation: 'endswith(', name: 'bool endswith(string p0, string p1)'},
-		{notation: 'startswith(', name: 'bool startswith(string p0, string p1)'},
-		{notation: 'length(', name: 'int length(string p0)'},
-		{notation: 'indexof(', name: 'int indexof(string p0, string p1)'},
-		{notation: 'replace(', name: 'string replace(string p0, string find, string replace)'},
-		{notation: 'substring(', name: 'string substring(string p0, int pos)'},
-		{notation: 'substring(', name: 'string substring(string p0, int pos, int length)'},
-		{notation: 'tolower(', name: 'string tolower(string p0)'},
-		{notation: 'toupper(', name: 'string toupper(string p0)'},
-		{notation: 'trim(', name: 'string trim(string p0)'},
-		{notation: 'concat(', name: 'string concat(string p0, string p1)'},
-		{notation: 'day(', name: 'int day(DateTime p0)'},
-		{notation: 'hour(', name: 'int hour(DateTime p0)'},
-		{notation: 'minute(', name: 'int minute(DateTime p0)'},
-		{notation: 'month(', name: 'int month(DateTime p0)'},
-		{notation: 'second(', name: 'int second(DateTime p0)'},
-		{notation: 'year(', name: 'int year(DateTime p0)'},
-		{notation: 'round(', name: 'double round(double p0)'},
-		{notation: 'round(', name: 'decimal round(decimal p0)'},
-		{notation: 'floor(', name: 'double floor(double p0)'},
-		{notation: 'floor(', name: 'decimal floor(decimal p0)'},
-		{notation: 'ceiling(', name: 'double ceiling(double p0)'},
-		{notation: 'ceiling(', name: 'decimal ceiling(decimal p0)'},
-		{notation: 'IsOf(', name: 'bool IsOf(type p0)'},
-		{notation: 'IsOf(', name: 'bool IsOf(expression p0, type p1)'}
-	],
+	operatorTable: {
+		'Logical Operators': [
+			{notation: 'eq', name: 'Equal'},
+			{notation: 'ne', name: 'Not equal'},
+			{notation: 'gt', name: 'Greater than'}, 
+			{notation: 'ge', name: 'Greater than or equal'},
+			{notation: 'lt', name: 'Less than'},
+			{notation: 'le', name: 'Less than or equal'},
+			{notation: 'and', name: 'Logical and'},
+			{notation: 'or', name: 'Logical or'},
+			{notation: 'not', name: 'Logical negation'}
+		],
+		'Arithmetic Operators': [
+			{notation: 'add', name: 'Addition'},
+			{notation: 'sub', name: 'Subtraction'},
+			{notation: 'mul', name: 'Multiplication'},
+			{notation: 'div', name: 'Division'},
+			{notation: 'mod', name: 'Modulo'}
+		]
+	},
+
+	functionTable: {
+		'String Functions': [
+			{notation: 'substringof(', name: 'bool substringof(string po, string p1))'},
+			{notation: 'endswith(', name: 'bool endswith(string p0, string p1)'},
+			{notation: 'startswith(', name: 'bool startswith(string p0, string p1)'},
+			{notation: 'length(', name: 'int length(string p0)'},
+			{notation: 'indexof(', name: 'int indexof(string p0, string p1)'},
+			{notation: 'replace(', name: 'string replace(string p0, string find, string replace)'},
+			{notation: 'substring(', name: 'string substring(string p0, int pos)'},
+			{notation: 'substring(', name: 'string substring(string p0, int pos, int length)'},
+			{notation: 'tolower(', name: 'string tolower(string p0)'},
+			{notation: 'toupper(', name: 'string toupper(string p0)'},
+			{notation: 'trim(', name: 'string trim(string p0)'},
+			{notation: 'concat(', name: 'string concat(string p0, string p1)'}
+		],
+		'Date Functions': [
+			{notation: 'day(', name: 'int day(DateTime p0)'},
+			{notation: 'hour(', name: 'int hour(DateTime p0)'},
+			{notation: 'minute(', name: 'int minute(DateTime p0)'},
+			{notation: 'month(', name: 'int month(DateTime p0)'},
+			{notation: 'second(', name: 'int second(DateTime p0)'},
+			{notation: 'year(', name: 'int year(DateTime p0)'}
+		],
+		'Math Functions': [
+			{notation: 'round(', name: 'double round(double p0)'},
+			{notation: 'round(', name: 'decimal round(decimal p0)'},
+			{notation: 'floor(', name: 'double floor(double p0)'},
+			{notation: 'floor(', name: 'decimal floor(decimal p0)'},
+			{notation: 'ceiling(', name: 'double ceiling(double p0)'},
+			{notation: 'ceiling(', name: 'decimal ceiling(decimal p0)'}
+		],
+		'Type Functions': [
+			{notation: 'IsOf(', name: 'bool IsOf(type p0)'},
+			{notation: 'IsOf(', name: 'bool IsOf(expression p0, type p1)'}
+		]
+	},
 	
 	create: function() {
 		this.inherited(arguments);
-		this.$.propertyList.setCount(this.propertyTable.length+this.associationTable.length+this.complexTypeTable.length+this.entityTypeTable.length);
-		this.$.propertyList.refresh();
-		this.$.operatorList.setCount(this.operatorTable.length);
-		this.$.operatorList.refresh();
-		this.$.functionList.setCount(this.functionTable.length);
-		this.$.functionList.refresh();
-		this.createComponent({
+		
+		this.metadataTable['Properties'] = this.propertyTable;
+		this.metadataTable['Associations'] = this.associationTable;
+		this.metadataTable['Entity Types'] = this.entityTypeTable;
+		this.metadataTable['Complex Types'] = this.complexTypeTable;
+
+		enyo.forEach(
+			this.tables,
+			function(table) {
+				var tableName = table.name+'Table';
+				enyo.forEach(
+					table.types,
+					function (type) {
+						this.createComponent({
+							kind: 'enyo.Control',
+							name: type,
+							ontap: 'openDrawer',
+							content: type,
+							container: this.$[table.name+'Menu'],
+							style: 'padding: 10px;'
+						});
+						this.createComponent({
+							name: type+"Drawer", 
+							orient: "v", 
+							kind: "onyx.Drawer", 
+							container: this.$[table.name+'Menu'],
+							open: false
+						});
+						this.createComponent({
+							classes: "onyx-menu-divider",
+							container: this.$[table.name+'Menu']
+						});
+						enyo.forEach(
+							this[tableName][type],
+							function (element) {
+								this.createComponent({
+									kind: 'onyx.MenuItem',
+									container: this.$[type+"Drawer"],
+									content: element.name,
+									notation: element.notation
+								});
+							},
+							this
+						);
+					},
+					this
+				);
+			},
+			this
+		);
+		
+		/*this.createComponent({
 			kind: "onyx.InputDecorator", 
 			components: [
 				{kind: "onyx.Input", name: "queryElementInput", disabled: false ,placeholder: "Query element.", style: "color: black; width: 100%;", type: "text"}
 			], 
 			style: "margin: 10px;  background-color: white; width: 30%; height: 30px; margin: 10px;"
+		});*/
+		var bases = [];
+		enyo.forEach(
+			this.tables,
+			function(table) {
+				var tableName = table.name+'Table';
+				enyo.forEach(
+					table.types,
+					function (type) {
+						enyo.forEach(
+							this[tableName][type],
+							function (element) {
+								if (table.name == 'metadata') {
+									bases.push({name: type + ': ' + element.name, notation: element.name});
+								} else {
+									bases.push({name: type + ': ' + element.name, notation: element.notation});
+								}
+							},
+							this
+						);
+					},
+					this
+				);
+			},
+			this
+		);
+		
+		bases.sort();
+		this.log(bases);
+		
+		this.createComponent({
+			kind: "autoComplete", 
+			name: 'autocompleteInput',
+			bases: bases,
+			style: 'width: 25%;'
 		});
-		if (this.option == '$expand') {
-			this.createComponent({
-				kind: "onyx.Button", 
-				name:"addComa",
-				content: "Add a slash", 
-				showing:true, 
-				ontap:"addSlash",
-				style: "background-color: cyan; color: purple; height: 30px; margin: 10px;"
-			});
-		}
 		this.createComponent({
 			kind: "onyx.Button", 
 			name:"addElementQuery",
 			content: "Add element to query.", 
 			showing:true, 
 			ontap:"addElementQuery",
-			style: "background-color: cyan; color: purple; height: 30px; margin: 5px;"
+			style: "background-color: cyan; color: purple; height: 30px; margin: 10px !important;"
 		});
 	},
 	
-	setupItemProperty: function(inSender, inEvent) {
-		this.$.propertyList.getControls();
-		var i = inEvent.index;
-		if (i < this.propertyTable.length) {
-			var n = this.propertyTable[i].name;
-		} else if (i < this.propertyTable.length+this.associationTable.length) {
-			var n = this.associationTable[i-this.propertyTable.length].name;
-		} else if (i < this.propertyTable.length+this.associationTable.length+this.complexTypeTable.length) {
-			var n = this.complexTypeTable[i-this.propertyTable.length-this.associationTable.length].name;
+	metadataSelected: function(inSender, inEvent) {
+		this.log(this);
+		this.log(this.$.autocompleteInput.$.autoCompleteInput.$.autoInput);
+		if (this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.getValue() == '') {
+			this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.setValue(inEvent.originator.content);
 		} else {
-			var n = this.entityTypeTable[i-this.propertyTable.length-this.associationTable.length-this.complexTypeTable.length].name;
+			this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.setValue(
+				this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.getValue() + ' ' + inEvent.originator.content);
 		}
-		this.$.itemProperty.addRemoveClass("list-sample-selected", inSender.isSelected(i));
-		this.$.property.setContent(n);
+		this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.render();
 	},
 	
-	setupItemOperator: function(inSender, inEvent) {
-		this.$.operatorList.getControls();
-		var i = inEvent.index;
-		var n = this.operatorTable[i].name;
-		this.$.itemOperator.addRemoveClass("list-sample-selected", inSender.isSelected(i));
-		this.$.operator.setContent(n);
-		this.$.operator.setProperty('notation', this.operatorTable[i].notation);
+	itemSelected: function(inSender, inEvent) {
+		if (this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.getValue() == '') {
+			this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.setValue(inEvent.originator.notation);
+		} else {
+			this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.setValue(
+				this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.getValue() + ' ' + inEvent.originator.notation);
+		}
+		this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.render();
 	},
 	
-	setupItemFunction: function(inSender, inEvent) {
-		this.$.functionList.getControls();
-		var i = inEvent.index;
-		var n = this.functionTable[i].name;
-		this.$.itemFunction.addRemoveClass("list-sample-selected", inSender.isSelected(i));
-		this.$.functions.setContent(n);
-		this.$.functions.setProperty('notation', this.functionTable[i].notation);
-	},
-	
-	propertySelected: function(inSender, inEvent) {
-		var i = inEvent.index;
-		if (i < this.propertyTable.length) {
-			var n = this.propertyTable[i].name;
-		} else if (i < this.propertyTable.length+this.associationTable.length) {
-			var n = this.associationTable[i-this.propertyTable.length].name;
-		} else if (i < this.propertyTable.length+this.associationTable.length+this.complexTypeTable.length) {
-			var n = this.complexTypeTable[i-this.propertyTable.length-this.associationTable.length].name;
-		} else {
-			var n = this.entityTypeTable[i-this.propertyTable.length-this.associationTable.length-this.complexTypeTable.length].name;
-		}
-		
-		if (this.$.queryElementInput.getValue() == '') {
-			this.$.queryElementInput.setValue(this.$.queryElementInput.getValue() + n);
-		} else {
-			this.$.queryElementInput.setValue(this.$.queryElementInput.getValue() + ' ' + n);
-		}
-		this.$.queryElementInput.render();
-	},
-	
-	operatorSelected: function(inSender, inEvent) {
-		if (this.$.queryElementInput.getValue() == '') {
-			this.$.queryElementInput.setValue(this.$.queryElementInput.getValue() + this.operatorTable[inEvent.index].notation);
-		} else {
-			this.$.queryElementInput.setValue(this.$.queryElementInput.getValue() + ' ' + this.operatorTable[inEvent.index].notation);
-		}
-		this.$.queryElementInput.render();
-	},
-	
-	functionSelected: function(inSender, inEvent) {
-		if (this.$.queryElementInput.getValue() == '') {
-			this.$.queryElementInput.setValue(this.$.queryElementInput.getValue() + this.functionTable[inEvent.index].notation);
-		} else {
-			this.$.queryElementInput.setValue(this.$.queryElementInput.getValue() + ' ' + this.functionTable[inEvent.index].notation);
-		}
-		
-		this.$.queryElementInput.render();
+	openDrawer:  function(inSender, inEvent) {
+		this.$[inSender.name+'Drawer'].setOpen(!this.$[inSender.name+'Drawer'].open);
 	},
 	
 	addElementQuery: function(inSender, inEvent) {
-		if (this.$.queryElementInput.getValue() != '') {
-			this.doAddToQuery({element: this.option + '=' + this.$.queryElementInput.getValue()});
+		if (this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.getValue() != '') {
+			this.doAddToQuery({element: this.option + '=' + this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.getValue()});
 			this.destroy();
 		} else {
 			alert('The query element is empty.');

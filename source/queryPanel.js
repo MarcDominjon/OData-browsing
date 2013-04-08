@@ -22,7 +22,7 @@ enyo.kind({
 			{kind: "onyx.Button",content: "Test request", showing:true, ontap:"testRequest", style: "background-color: purple; color: cyan;"}
 		]},
 		{kind: "onyx.Toolbar", classes: "onyx-menu-toolbar", components: [
-			{kind: "onyx.MenuDecorator", selectable: true, onSelect: "itemSelected", components: [
+			{kind: "onyx.MenuDecorator", selectable: true, /*onSelect: ''"itemSelected",*/ components: [
 				{content: "Options Menu"},
 				{kind: "onyx.Menu", name: "optionMenu"}
 			]}
@@ -34,6 +34,7 @@ enyo.kind({
 		"expand",
 		"filter",
 		"format",
+		"functions",
 		"inlinecount",
 		"links",
 		"metadata",
@@ -41,23 +42,97 @@ enyo.kind({
 		"select",
 		"skip",
 		"top",
-		"value",
+		"value"
 	],
+
+	optionParameters: {
+		"format": [
+			{'name': "Atom"},
+			{'name': "Xml"},
+			{'name': "Json"}
+		],
+		"inlinecount": [
+			{'name': "allpages"},
+			{'name': "none"}
+		],
+		"links": "",
+		"orderby": ""
+	},
+	
+	entitySet: '',
+	properties: '',
+	associations: '',
+	complexTypes: '',
+	entityTypes: '',
+	importFunctions: '',
 	
 	create : function() {
 		this.inherited(arguments);
 		this.$.requestInput.setValue(this.request);
 		this.$.requestInput.render();
+		
+		var last = this.request.split('/').pop();
+		if (last.indexOf('(') == -1 ) {
+			var entityType = last;
+		} else {
+			var entityType = last.slice(0,last.indexOf('('));
+		}
+		
+		this.entitySet = this.findEntitySet(entityType);
+		this.properties = this.findProperties(this.entitySet);
+		this.associations = this.findAssociations(this.entitySet);
+		this.complexTypes = this.fetchComplexTypes();
+		this.entityTypes = this.fetchEntityTypes();
+		this.importFunctions = this.fetchImportFunctions();
+		
+		this.optionParameters.links = this.associations;
+		this.optionParameters.orderby = this.properties;
+
 		enyo.forEach(
 			this.options, 
 			function (option) {
-				this.createComponent({
-					kind: 'onyx.MenuItem',
-					classes: 'onyx.menu.item',
-					content: '$' + option,
-					container: this.$.optionMenu,
-					style: 'padding: 10px;'
-				});
+				if (option == "format" || option == "inlinecount" || option == "links" || option == "orderby") {
+					this.createComponent({
+						/*kind: 'onyx.MenuItem',
+						classes: 'onyx.menu.item',*/
+						kind: 'enyo.Control',
+						name: option,
+						ontap: 'openDrawer',
+						content: '$' + option,
+						container: this.$.optionMenu,
+						style: 'padding: 10px;'
+					});
+					this.createComponent({
+						name: option+"Drawer", 
+						orient: "v", 
+						kind: "onyx.Drawer", 
+						container: this.$.optionMenu,
+						open: false
+					});
+					enyo.forEach(
+						this.optionParameters[option],
+						function (parameter) {
+							this.createComponent({
+								kind: 'onyx.MenuItem',
+								container: this.$[option+"Drawer"],
+								onSelect: 'parameterSelected',
+								content: parameter.name,
+								option: '$' + option
+							});
+						},
+						this
+					);
+				} else {
+					this.createComponent({
+						kind: 'onyx.MenuItem',
+						classes: 'onyx.menu.item',
+						onSelect: 'itemSelected',
+						content: '$' + option,
+						container: this.$.optionMenu,
+						style: 'padding: 10px;'
+					});
+				}
+				
 				this.createComponent({
 					classes: "onyx-menu-divider",
 					container: this.$.optionMenu
@@ -81,22 +156,9 @@ enyo.kind({
 	itemSelected: function(inSender, inEvent) {
 		var option = inEvent.originator.content;
 		
-		var last = this.request.split('/').pop();
-		if (last.indexOf('(') == -1 ) {
-			var entityType = last;
-		} else {
-			var entityType = last.slice(0,last.indexOf('('));
-		}
-		
-		var entitySet = this.findEntitySet(entityType);
-		var properties = this.findProperties(entitySet);
-		var associations = this.findAssociations(entitySet);
-		var complexTypes = this.fetchComplexTypes();
-		var entityTypes = this.fetchEntityTypes();
-		
 		if (this.query.indexOf(option) == -1 && this.request.indexOf(option) == -1) {
 			
-			if (option != '$medatata' && option != '$links' && option != '$count' && option != '$value') {
+			if (option != '$medatata' && option != '$links' && option != '$count' && option != '$value'  && option != '$functions') {
 				if (this.query.indexOf("?") == -1 && this.request.indexOf("?") == -1) {
 					this.setQuery(this.query + "?");
 				}
@@ -179,7 +241,7 @@ enyo.kind({
 						]
 					});
 					enyo.forEach(
-						associations,
+						this.associations,
 						function (association) {
 							this.createComponent({
 								kind: 'onyx.MenuItem',
@@ -196,24 +258,31 @@ enyo.kind({
 						this.createComponent({
 							kind: "propertiesList",
 							name: 'optionInput',
-							propertyTable: associations,
+							propertyTable: this.associations,
 							option: option
 						});
 					} else if (option == "$filter") {
 						this.createComponent({
 							kind: "queryFilter",
 							name: 'optionInput',
-							propertyTable: properties,
-							associationTable: associations,
-							complexTypeTable: complexTypes,
-							entityTypeTable: entityTypes,
+							propertyTable: this.properties,
+							associationTable: this.associations,
+							complexTypeTable: this.complexTypes,
+							entityTypeTable: this.entityTypes,
+							option: option
+						});
+					} else if (option == "$functions") {
+						this.createComponent({
+							kind: "importFunctions",
+							name: 'optionInput',
+							functionsTable: this.importFunctions,
 							option: option
 						});
 					} else {
 						this.createComponent({
 							kind: "propertiesList",
 							name: 'optionInput',
-							propertyTable: properties,
+							propertyTable: this.properties,
 							option: option
 						});
 					}	
@@ -319,10 +388,39 @@ enyo.kind({
 		if (metadata.dataServices.schema[0].complexType)
 		{
 			complexTypes = metadata.dataServices.schema[0].complexType;
-		} else if (metadata.dataServices.schema[1].complexType){
-			complexTypes = metadata.dataServices.schema[1].complexType;
+		} else if (metadata.dataServices.schema[1]){
+			if (metadata.dataServices.schema[1].complexType) {
+				complexTypes = metadata.dataServices.schema[1].complexType;
+			}
 		}
 		return complexTypes;
+	},
+	
+	fetchImportFunctions: function() {
+		var metadata = OData.defaultMetadata[0];
+		var functions = [];
+		var i = 0;
+		if (metadata.dataServices.schema[0].entityContainer)
+		{
+			enyo.forEach(
+				metadata.dataServices.schema[0].entityContainer[0].functionImport, 
+				function (importFunction) {
+					functions[i] = {name: importFunction.name, detail: importFunction};
+					i++;
+				},
+				this
+			);
+		} else if (metadata.dataServices.schema[1].entityContainer){
+			enyo.forEach(
+				metadata.dataServices.schema[1].entityContainer[0].functionImport, 
+				function (entitySet) {
+					functions[i] = {name: importFunction.name, detail: importFunction};
+					i++;
+				}, 
+				this
+			);
+		}
+		return functions;
 	},
 	
 	optionSelected: function(inSender, inEvent) {
@@ -333,6 +431,16 @@ enyo.kind({
 	
 	linkSelected: function(inSender, inEvent) {
 		this.setQuery('/' + inEvent.originator.option + '/' + inEvent.originator.content);
+	},
+	
+	parameterSelected: function(inSender, inEvent) {
+		if (this.query.indexOf(inEvent.originator.option) == -1 && this.request.indexOf(inEvent.originator.option) == -1) {
+			if (inEvent.originator.option == '$links') {
+				this.setQuery('/' + inEvent.originator.option + '/' + inEvent.originator.content);
+			} else {
+				this.setQuery(this.query + inEvent.originator.option + '=' + inEvent.originator.content);
+			}
+		}
 	},
 	
 	inputQueryChanged: function(inSender, inEvent) {
@@ -372,7 +480,6 @@ enyo.kind({
 							{tag: 'pre', content: 'Result from ' + requestToTest + ' : ' + '\n' + text}
 						]
 					});
-					this.log(this.$.resultTest);
 					this.$.resultTest.render();
 				}				
 			), 
@@ -380,7 +487,7 @@ enyo.kind({
 				this,	
 				function(err) {
 					this.log(err);
-					var text = err.message + ' : ' + err.response.statusCode + ' , ' + err.response.statusText;
+					var text = err.message + ' : ' + err.response.statusCode + ' , ' + err.response.statusText + '\n' + err.response.body;
 					this.createComponent({
 						name: 'resultTest',
 						tag: 'pre',
@@ -392,6 +499,9 @@ enyo.kind({
 		);
 	},
 	
+	openDrawer:  function(inSender, inEvent) {
+		this.$[inSender.name+'Drawer'].setOpen(!this.$[inSender.name+'Drawer'].open);
+	},
 	
 	addToQuery: function(inSender, inEvent) {
 		this.setQuery(this.query + inEvent.element);
