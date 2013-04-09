@@ -411,6 +411,43 @@
 					enyo.log(err);
 				}
 			);*/
+			enyo.kind({
+				name: 'byor',
+				published:{
+					method: '',
+					uri: '',
+					data: ''
+				},
+				request: '',
+				header: '',
+				create: function() {
+					this.inherited(arguments);
+					if (this.method == 'PUT' || this.method == 'MERGE'|| this.method == 'DELETE') {
+						this.header = {"DataServiceVersion": "2.0", "X-HTTP-Method": this.method, "If-Match": '*'};
+						this.request = {headers: this.header, requestUri: this.uri, method: 'POST', data: this.data};
+					} else {
+						this.header = {"DataServiceVersion": "2.0"};
+						this.request = {headers: this.header, requestUri: this.uri, method: this.method, data: this.data};
+					}
+					
+					OData.request(
+						this.request,
+						function (data) { 
+							enyo.log('data', data);
+						}
+					);
+				}
+			});
+			new byor({method: 'GET', uri: 'http://ent112.sharepoint.hp.com/teams/enyo-odata/_vti_bin/listdata.svc/Tasks'});
+			//new byor({method: 'POST', uri: 'http://ent112.sharepoint.hp.com/teams/enyo-odata/_vti_bin/listdata.svc/Tasks', data: {Title: 'Another one', Description: 'Another test of POST.'}});
+			//new byor({method: 'GET', uri: 'http://ent112.sharepoint.hp.com/teams/enyo-odata/_vti_bin/listdata.svc/Tasks(7)'});
+			new byor({method: 'PUT', uri: 'http://ent112.sharepoint.hp.com/teams/enyo-odata/_vti_bin/listdata.svc/Tasks(7)', data: {Id: 7, Title: 'Another another one'}});
+			new byor({method: 'GET', uri: 'http://ent112.sharepoint.hp.com/teams/enyo-odata/_vti_bin/listdata.svc/Tasks(7)'});
+			new byor({method: 'MERGE', uri: 'http://ent112.sharepoint.hp.com/teams/enyo-odata/_vti_bin/listdata.svc/Tasks(7)', data: {Title: 'Another one', AssignedToId: 2}});
+			new byor({method: 'GET', uri: 'http://ent112.sharepoint.hp.com/teams/enyo-odata/_vti_bin/listdata.svc/Tasks(7)'});
+			//new byor({method: 'DELETE', uri: 'http://ent112.sharepoint.hp.com/teams/enyo-odata/_vti_bin/listdata.svc/Tasks(7)'});
+			new byor({method: 'GET', uri: 'http://ent112.sharepoint.hp.com/teams/enyo-odata/_vti_bin/listdata.svc/Tasks(7)'});
+			/*new byor({method: 'DELETE', uri: 'http://ent112.sharepoint.hp.com/teams/enyo-odata/_vti_bin/listdata.svc/Tasks(7)'});*/
 		</script>
 	</body>
 </html>

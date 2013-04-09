@@ -84,39 +84,45 @@ enyo.kind({
 	},
 	
 	linkSelected:function(inSender,inEvent){
-		OData.read(
-			inEvent.element.uri,
-			enyo.bind(
-				this, 
-				function (data) {
-					if (data.results) {
-						this.createComponent({
-							kind: 'entity',
-							container: this,
-							entitySet: inEvent.element.entityType,
-							elements: data,
-							style: "background-color: grey; width:100%; height:100%;"
-						});
-					} else {
-						this.createComponent({
-							kind: 'element',
-							container: this,
-							properties: data,
-							entityType: inEvent.element.entityType,
-							identification: inEvent.element.identification
-						});
+		this.log(inEvent.element.uri);
+		if (inEvent.element.uri) {
+			OData.read(
+				inEvent.element.uri,
+				enyo.bind(
+					this, 
+					function (data) {
+						if (data.results) {
+							this.createComponent({
+								kind: 'entity',
+								container: this,
+								entitySet: inEvent.element.entityType,
+								elements: data,
+								style: "background-color: grey; width:100%; height:100%;"
+							});
+						} else {
+							this.createComponent({
+								kind: 'element',
+								container: this,
+								properties: data,
+								entityType: inEvent.element.entityType,
+								identification: inEvent.element.identification
+							});
+						}
+						this.reflow();
+						this.setIndex(this.count++);
+						if (data.results && data.results.length == 0) {
+							alert('ND');
+							this.goBack();
+							this.doBackEntity();
+						}
 					}
-					this.reflow();
-					this.setIndex(this.count++);
-					if (data.results && data.results.length == 0) {
-						alert('ND');
-						this.goBack();
-						this.doBackEntity();
-					}
-				}
-			),
-			enyo.bind(this,"processError")
-		);
+				),
+				enyo.bind(this,"processError")
+			);
+		} else {
+			alert('ND');
+			this.doBackEntity();
+		}
 	},
 	
 	goBack:function(inSender,inEvent){

@@ -63,7 +63,7 @@ enyo.kind({
 	
 	testUri: function() {
 		var metadata = '/$metadata';
-		this.log(this.otherUri);
+		this.log(this.otherUri+metadata);
 		if (this.otherUri.slice(-1) == '/') {
 			this.otherUri = this.otherUri.slice(0,-1);
 		}
@@ -78,7 +78,6 @@ enyo.kind({
 	correctUri: function(data) {
 		this.log(data);
 		if (!data) {
-			this.log('Arnak');
 			this.notACorrectUri();
 			return;
 		}

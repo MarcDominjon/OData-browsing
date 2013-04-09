@@ -9,7 +9,7 @@ enyo.kind({
 	events:{
 		onLinkSelected: "",
 		onLinkSelectedApp: "",
-		onBackElement:"d",
+		onBackElement:"",
 		onBack:""
 	},
 	components:[

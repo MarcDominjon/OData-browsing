@@ -3,7 +3,7 @@
 	url = ../../enyojs/enyo.git
 [submodule "lib/onyx"]
 	path = lib/onyx
-	url = ../onyx.git
+	url = ../../enyojs/onyx.git
 [submodule "lib/layout"]
 	path = lib/layout
-	url = ../layout.git
+	url = ../../enyojs/layout.git
