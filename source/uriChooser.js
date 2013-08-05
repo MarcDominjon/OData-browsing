@@ -19,9 +19,9 @@ enyo.kind({
 	uriStandard: [
 		"http://services.odata.org/Northwind/Northwind.svc",
 		"http://services.odata.org/OData/OData.svc",
-		"http://services.odata.org/(S(zxibds3pxh30cejlp1tkkbki))/OData/OData.svc"
+		"http://services.odata.org/v3/(S(fvwqbovarvgasjtd3xuybkye))/odata/odata.svc/"
 	],
-	uriString: "http://services.odata.org/Northwind/Northwind.svc,http://services.odata.org/OData/OData.svc,http://services.odata.org/(S(zxibds3pxh30cejlp1tkkbki))/OData/OData.svc",
+	uriString: "http://services.odata.org/Northwind/Northwind.svc,http://services.odata.org/OData/OData.svc,http://services.odata.org/v3/(S(fvwqbovarvgasjtd3xuybkye))/odata/odata.svc/",
 	uriTable: [],
 	create: function() {
 		this.inherited(arguments);

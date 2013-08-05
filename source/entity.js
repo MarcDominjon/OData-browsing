@@ -9,7 +9,8 @@ enyo.kind({
 		onElementSelected: "",
 		onElementSelectedApp: "",
 		onBackEntity:"",
-		onBack: ""
+		onBack: "",
+		onAddEntry:""
 	},
 	components:[
 		{kind:"onyx.Toolbar", name: 'toolbar', components:[				
@@ -29,6 +30,20 @@ enyo.kind({
 			fit: true,
 			style: "width:100%; height:100%; background-color: grey;"
 		});
+		var propertiesEntity = this.findProperties(this.entitySet);
+		var navigationEntity = this.findNavigationProperties(this.entitySet);
+		this.log(this);
+		this.createComponent({
+			kind: 'onyx.Button',
+			container: this.$[this.entitySet.name],
+			content: 'Add new entry',
+			uri: this.parent.owner.$.requestInput.getValue(),
+			entitySet: this.entitySet,
+			properties: propertiesEntity,
+			navigation: navigationEntity,
+			ontap: "addEntry",
+			style: "background-color: yellow; color: green; margin: 10px;"
+		});
 		if (this.elements.results) {
 			enyo.forEach(
 				this.elements.results, 
@@ -41,19 +56,13 @@ enyo.kind({
 	},
 	
 	addElementButton : function(element) {
-		var refProperty = this.findRefProperty(this.entitySet);
-		var content = '';
-		enyo.forEach(
-			refProperty, 
-			function (refProperty) {
-				content = content + refProperty.name + '=' + element[refProperty.name] + ',' 
-			},
-			this
-		);
+		var refProperty = enyo.Odata.findRefProperties(this.entitySet);
+		this.log(refProperty);
+		var content = enyo.Odata.entryDescription(refProperty, element);
 		this.createComponent({
 			kind: 'onyx.Button',
 			container: this.$[this.entitySet.name],
-			content: content.slice(0, -1),
+			content: content,
 			detail: element,
 			identification: content,
 			entitySet: this.entitySet,
@@ -63,7 +72,11 @@ enyo.kind({
 		this.$[this.entitySet.name].render();
 	},
 	
-	findRefProperty : function(entitySet) {
+	addEntry : function(inSender,inEvent) {
+		this.doAddEntry({detail: inEvent.originator});
+	},
+	
+	/*findRefProperty : function(entitySet) {
 		var refProperty = [];
 		var namespace = OData.defaultMetadata[0].dataServices.schema[0].namespace;
 		enyo.forEach(
@@ -76,7 +89,38 @@ enyo.kind({
 			this
 		);
 		return refProperty;
+	},*/
+	
+	findProperties : function(entitySet) {
+		var properties = [];
+		var namespace = OData.defaultMetadata[0].dataServices.schema[0].namespace;
+		enyo.forEach(
+			OData.defaultMetadata[0].dataServices.schema[0].entityType, 
+			function (entityType) {
+				if (namespace + '.' + entityType.name == entitySet.entityType) {
+					properties = entityType.property;
+				}
+			},
+			this
+		);
+		return properties;
 	},
+	
+	findNavigationProperties: function(entitySet) {
+		var navigationProperties = [];
+		var namespace = OData.defaultMetadata[0].dataServices.schema[0].namespace;
+		enyo.forEach(
+			OData.defaultMetadata[0].dataServices.schema[0].entityType, 
+			function (entityType) {
+				if (namespace + '.' + entityType.name == entitySet.entityType) {
+					navigationProperties = entityType.navigationProperty;
+				}
+			},
+			this
+		);
+		return navigationProperties;
+	},
+	
 	
 	elementSelected:function(inSender,inEvent){
 		this.doElementSelected({element: inEvent.originator});

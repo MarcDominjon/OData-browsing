@@ -10,12 +10,14 @@ enyo.kind({
 		onElementSelected:"elementSelected",
 		onLinkSelected:"linkSelected",
 		onUriSelected: "browseService",
-		onBack:"goBack"
+		onBack:"goBack",
+		onAddEntry:"newEntry"
 	},
 	events:{
 		onBackEntity:""
 	},
 	components: [{kind: 'uriChooser', name: 'uri'}],
+	rootServiceUri: '',
 	
 	create : function() {
 		this.inherited(arguments);
@@ -35,6 +37,7 @@ enyo.kind({
 			container: this,
 			url: inEvent.uri
 		});
+		this.rootServiceUri = this.url;
 		this.render();
 		this.reflow();
 		this.setIndex(this.count++);
@@ -84,14 +87,13 @@ enyo.kind({
 	},
 	
 	linkSelected:function(inSender,inEvent){
-		this.log(inEvent.element.uri);
 		if (inEvent.element.uri) {
 			OData.read(
 				inEvent.element.uri,
 				enyo.bind(
 					this, 
 					function (data) {
-						if (data.results) {
+						if (data && data.results) {
 							this.createComponent({
 								kind: 'entity',
 								container: this,
@@ -110,7 +112,7 @@ enyo.kind({
 						}
 						this.reflow();
 						this.setIndex(this.count++);
-						if (data.results && data.results.length == 0) {
+						if (data && data.results && data.results.length == 0) {
 							alert('ND');
 							this.goBack();
 							this.doBackEntity();
@@ -123,6 +125,22 @@ enyo.kind({
 			alert('ND');
 			this.doBackEntity();
 		}
+	},
+	
+	newEntry:function(inSender,inEvent){
+		this.log(this);
+		this.createComponent({
+			kind: 'write',
+			container: this,
+			uri: inEvent.detail.uri,
+			serviceRoot: this.rootServiceUri,
+			entitySet: inEvent.detail.entitySet,
+			properties: inEvent.detail.properties,
+			navigation: inEvent.detail.navigation,
+			style: "background-color: grey; width:100%; height:100%;"
+		});
+		this.reflow();
+		this.setIndex(this.count++);
 	},
 	
 	goBack:function(inSender,inEvent){

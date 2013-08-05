@@ -35,7 +35,7 @@ enyo.kind({
 			);
 			this.identification = content;
 		}
-		this.$.title.setContent(this.entityType.name + ': ' + this.identification.slice(0,-1));
+		this.$.title.setContent(this.entityType.name + ': ' + this.identification);
 		for (var key in this.properties) {
 			if (this.properties[key] == null) {
 				this.addDetail(key, 'ND');

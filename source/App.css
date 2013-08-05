@@ -9,10 +9,18 @@
 .list-sample {
 	background-color: grey;
 }
-.list-sample-list {
-	width: 50%;
-	min-width: 400px;
+.list-sample-list, .list_links {
+	width: 40%;
+	min-width: 200px;
 	max-width: 800px;
+	margin: auto;
+	background-color: #eee;
+}
+.list_links {
+	min-width: 50px;
+	max-width: 200px;
+	min-height: 180px;
+	max-height: 300px;
 	margin: auto;
 	background-color: #eee;
 }

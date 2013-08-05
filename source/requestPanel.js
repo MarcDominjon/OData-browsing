@@ -37,16 +37,20 @@ enyo.kind({
 	},
 	
 	addUriEntity: function(inSender, inEvent) {
-		this.request = this.request + '/' + inEvent.entityType.name;
+		if (this.request.slice(-1) == "/") {
+			this.request = this.request + inEvent.entityType.name;
+		} else {
+			this.request = this.request + '/' + inEvent.entityType.name;
+		}
 		this.$.requestInput.setValue(this.request);
 		this.$.requestInput.render();
 	},
 	
 	addUriElement: function(inSender, inEvent) {
 		var str = inEvent.element.identification;
-		var table = str.split("");
-		table.pop();
-		str = table.join("");
+		if (str.split("=").length - 1 == 1) {
+			str = str.split("=")[1];
+		}
 		this.request = this.request + '(' + str + ')';
 		this.$.requestInput.setValue(this.request);
 		this.$.requestInput.render();

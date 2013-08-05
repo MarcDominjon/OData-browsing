@@ -4,7 +4,7 @@ enyo.depends(
 	//"Theme.less",	// uncomment this line, and follow the steps described in Theme.less
 	"App.css",
 	"App.js",
-	"datajs-1.0.1.js",	
+	"datajs-1.1.0.js",	
 	"metadata.js",
 	"entity.js",
 	"element.js",
@@ -15,5 +15,8 @@ enyo.depends(
 	"propertiesList.js",
 	"queryFilter.js",
 	"autoComplete.js",
-	"importFunctions.js"
+	"importFunctions.js",
+	"write.js",
+	"request.js",
+	"odataFunctions.js"
 );
