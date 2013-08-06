@@ -1,3 +1,4 @@
+/* global OData */
 enyo.kind({
 	name:"entity",
 	style:"background-color: grey;",

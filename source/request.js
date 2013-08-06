@@ -49,9 +49,7 @@ enyo.kind({
 		
 		var header = {"DataServiceVersion": "1.0", 'MaxDataServiceVersion':'2.0', 'accept': 'application/json;'};
 		
-		
-		var that = this;
-		
+		var method, postBody;
 		if (this.method == 'PUT' || this.method == 'MERGE'|| this.method == 'DELETE') {
 			var ajaxPreRequest = new enyo.Ajax({
 				url: this.uri,
@@ -99,12 +97,12 @@ enyo.kind({
 			});
 			this.log(lol);*/
 			header['X-HTTP-Method'] = this.method;
-			var method = 'POST';
-			var postBody = this.data;
+			method = 'POST';
+			postBody = this.data;
 		} else {
-			var method = this.method;
+			method = this.method;
 			if (this.method == 'POST') {
-				var postBody = this.data;
+				postBody = this.data;
 			}
 		}
 		

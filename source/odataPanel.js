@@ -1,3 +1,4 @@
+/* global OData, alert */
 enyo.kind({
 	name: "odataPanel",
 	kind: "enyo.Panels",
@@ -75,7 +76,7 @@ enyo.kind({
 					});
 					this.reflow();
 					this.setIndex(this.count++);
-					if (data.results && data.results.length == 0) {
+					if (data.results && data.results.length === 0) {
 						alert('ND');
 						this.goBack();
 						this.doBackEntity();
@@ -112,7 +113,7 @@ enyo.kind({
 						}
 						this.reflow();
 						this.setIndex(this.count++);
-						if (data && data.results && data.results.length == 0) {
+						if (data && data.results && data.results.length === 0) {
 							alert('ND');
 							this.goBack();
 							this.doBackEntity();

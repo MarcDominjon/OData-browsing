@@ -1,3 +1,4 @@
+/* global alert */
 enyo.kind({
 	name: 'propertiesList',
 	kind: "enyo.FittableColumns",
@@ -62,7 +63,7 @@ enyo.kind({
 			if (this.option == '$select' || this.option == '$expand') {
 				if (this.propertyTable[inEvent.index].name == '*' || this.$.queryElementInput.getValue() == '*') {
 					this.$.queryElementInput.setValue(this.propertyTable[inEvent.index].name);
-				} else if (this.$.queryElementInput.getValue().slice(-1) != '/' && this.$.queryElementInput.getValue() != '') {
+				} else if (this.$.queryElementInput.getValue().slice(-1) != '/' && this.$.queryElementInput.getValue() !== '') {
 					if (this.$.queryElementInput.getValue().indexOf(this.propertyTable[inEvent.index].name) == -1) {
 						this.$.queryElementInput.setValue(this.$.queryElementInput.getValue() + ',' + this.propertyTable[inEvent.index].name);
 					}
@@ -75,7 +76,7 @@ enyo.kind({
 	},
 	
 	addElementQuery: function(inSender, inEvent) {
-		if (this.$.queryElementInput.getValue() != '') {
+		if (this.$.queryElementInput.getValue() !== '') {
 			this.doAddToQuery({element: this.option + '=' + this.$.queryElementInput.getValue()});
 			this.destroy();
 		} else {

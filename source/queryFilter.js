@@ -1,3 +1,4 @@
+/* global alert */
 enyo.kind({
 	name: 'queryFilter',
 	kind: "enyo.FittableColumns",
@@ -206,7 +207,7 @@ enyo.kind({
 	metadataSelected: function(inSender, inEvent) {
 		this.log(this);
 		this.log(this.$.autocompleteInput.$.autoCompleteInput.$.autoInput);
-		if (this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.getValue() == '') {
+		if (this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.getValue() === '') {
 			this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.setValue(inEvent.originator.content);
 		} else {
 			this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.setValue(
@@ -216,7 +217,7 @@ enyo.kind({
 	},
 	
 	itemSelected: function(inSender, inEvent) {
-		if (this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.getValue() == '') {
+		if (this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.getValue() === '') {
 			this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.setValue(inEvent.originator.notation);
 		} else {
 			this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.setValue(
@@ -230,7 +231,7 @@ enyo.kind({
 	},
 	
 	addElementQuery: function(inSender, inEvent) {
-		if (this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.getValue() != '') {
+		if (this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.getValue() !== '') {
 			this.doAddToQuery({element: this.option + '=' + this.$.autocompleteInput.$.autoCompleteInput.$.autoInput.getValue()});
 			this.destroy();
 		} else {

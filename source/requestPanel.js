@@ -63,7 +63,7 @@ enyo.kind({
 	},
 	
 	delUriRoot: function(inSender, inEvent) {
-		this.request = ""
+		this.request = "";
 		this.$.requestInput.setValue(this.request);
 		this.$.requestInput.render();
 	},
@@ -81,9 +81,10 @@ enyo.kind({
 		if (str.split('').pop() == ')'){
 			var patt = /\((.*?)\)/g;
 			var match= "";
-			var matches = "";
-			while (matches = patt.exec(str)) {
+			var matches = patt.exec(str);
+			while (matches) {
 				match = matches.index;
+				matches = patt.exec(str);
 			}
 			this.request = str.slice(0, match);
 			this.$.requestInput.setValue(this.request);

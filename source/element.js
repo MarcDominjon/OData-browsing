@@ -1,3 +1,4 @@
+/* global OData */
 enyo.kind({
 	name:"element",
 	style:"background-color: grey;",
@@ -23,13 +24,13 @@ enyo.kind({
 	
 	create: function(){
 		this.inherited(arguments);
-		if (this.identification == "") {
+		if (this.identification === "") {
 			var refProperty = this.findRefProperty(this.entityType);
 			var content = '';
 			enyo.forEach(
 				refProperty, 
 				function (refProperty) {
-					content = content + refProperty.name + '=' + this.properties[refProperty.name] + ',' 
+					content = content + refProperty.name + '=' + this.properties[refProperty.name] + ',';
 				},
 				this
 			);

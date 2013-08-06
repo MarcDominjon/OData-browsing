@@ -1,14 +1,15 @@
+/* global OData */
 enyo.kind({
     name: "enyo.Odata",
     statics: {
         findEntitySet: function (entityName) {
 			var meta = OData.defaultMetadata[0];
 			var namespace = meta.dataServices.schema[0].namespace;
+			var schema, entityContainer, entitySet;
 			if (meta.dataServices.schema[0].entityContainer)
 			{
-				var schema = meta.dataServices.schema[0];
-				var entityContainer = schema.entityContainer[0];
-				var entitySet = '';
+				schema = meta.dataServices.schema[0];
+				entityContainer = schema.entityContainer[0];
 				enyo.forEach(
 					entityContainer.entitySet, 
 					function (entitySets) {
@@ -21,8 +22,8 @@ enyo.kind({
 					this
 				);
 			} else if (meta.dataServices.schema[1].entityContainer){
-				var schema = meta.dataServices.schema[1];
-				var entityContainer = schema.entityContainer[0];
+				schema = meta.dataServices.schema[1];
+				entityContainer = schema.entityContainer[0];
 				enyo.forEach(
 					entityContainer.entitySet, 
 					function (entitySets) {
@@ -120,7 +121,7 @@ enyo.kind({
 		
 		entryDescription: function (refProperties, element) {
 			var description = "";
-			propertiesNum = 0;
+			var propertiesNum = 0;
 			enyo.forEach(
 				refProperties, 
 				function (refProperty) {
@@ -149,6 +150,7 @@ enyo.kind({
 		
 		findRelationship: function (relationWanted) {
 			var meta = OData.defaultMetadata[0];
+			var relation;
 			enyo.forEach(
 				meta.dataServices.schema[0].association, 
 				function (association) {

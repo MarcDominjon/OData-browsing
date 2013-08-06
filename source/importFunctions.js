@@ -75,8 +75,8 @@ enyo.kind({
 		enyo.forEach(
 			this.selectedFunction.parameter,
 			function(parameter) {
-				if (this.$[parameter.name+"Input"].getValue() != '') {
-					if (parameters == '') {
+				if (this.$[parameter.name+"Input"].getValue() !== '') {
+					if (parameters === '') {
 						parameters += '?' + parameter.name + '=' + this.$[parameter.name+"Input"].getValue();
 					} else {
 						parameters += '&' + parameter.name + '=' + this.$[parameter.name+"Input"].getValue();

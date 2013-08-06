@@ -1,3 +1,4 @@
+/* global OData, alert */
 enyo.kind({
 	name: "uriChooser",
 	classes: "list-sample enyo-fit",

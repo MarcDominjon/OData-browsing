@@ -1,3 +1,4 @@
+/* global OData, alert */
 enyo.kind({
 	name: "queryPanel",
 	kind: "FittableRows",
@@ -72,10 +73,11 @@ enyo.kind({
 		this.$.requestInput.render();
 		
 		var last = this.request.split('/').pop();
+		var entityType;
 		if (last.indexOf('(') == -1 ) {
-			var entityType = last;
+			entityType = last;
 		} else {
-			var entityType = last.slice(0,last.indexOf('('));
+			entityType = last.slice(0,last.indexOf('('));
 		}
 		
 		this.entitySet = this.findEntitySet(entityType);
@@ -164,7 +166,7 @@ enyo.kind({
 				}
 				
 				if (this.query.slice(-1) != "?" && this.query.slice(-1) != "&"
-				&& !(this.query == '' && this.request.slice(-1) != "?" && this.request.slice(-1) != "&")){
+				&& !(this.query === '' && this.request.slice(-1) != "?" && this.request.slice(-1) != "&")){
 					this.setQuery(this.query + "&");
 				}
 			}
@@ -355,7 +357,6 @@ enyo.kind({
 	
 	fetchEntityTypes: function() {
 		var metadata = OData.defaultMetadata[0];
-		var namespace = metadata.dataServices.schema[0].namespace;
 		var entityTypes = [];
 		var i = 0;
 		if (metadata.dataServices.schema[0].entityContainer)
@@ -383,7 +384,6 @@ enyo.kind({
 	
 	fetchComplexTypes: function() {
 		var metadata = OData.defaultMetadata[0];
-		var namespace = metadata.dataServices.schema[0].namespace;
 		var complexTypes = [];
 		if (metadata.dataServices.schema[0].complexType)
 		{
@@ -413,7 +413,7 @@ enyo.kind({
 		} else if (metadata.dataServices.schema[1].entityContainer){
 			enyo.forEach(
 				metadata.dataServices.schema[1].entityContainer[0].functionImport, 
-				function (entitySet) {
+				function (importFunction) {
 					functions[i] = {name: importFunction.name, detail: importFunction};
 					i++;
 				}, 
@@ -448,7 +448,7 @@ enyo.kind({
 	},
 	
 	addElementQuery: function(inSender, inEvent) {
-		if (this.$.queryElementInput.getValue() != '' && !isNaN(this.$.queryElementInput.getValue())) {
+		if (this.$.queryElementInput.getValue() !== '' && !isNaN(this.$.queryElementInput.getValue())) {
 			this.doAddToQuery({element: this.$.queryElementInput.getProperty('option') + '=' + this.$.queryElementInput.getValue()});
 			this.$.optionInput.destroy();
 		} else {

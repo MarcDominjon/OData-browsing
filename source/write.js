@@ -1,3 +1,4 @@
+/* global OData, request */
 enyo.kind({
 	name: 'write',
 	published: {
@@ -159,7 +160,7 @@ enyo.kind({
 		enyo.forEach(
 			this.properties, 
 			function (property) {
-				name = property.name;
+				var name = property.name;
 				if (this.$[name].getValue()) {
 					data[this.$[name].name] = this.$[name].getValue();
 				}
@@ -180,7 +181,7 @@ enyo.kind({
 							this
 						);
 					} else if (this.$[navigation.name+"List"].entries) {
-						if (enyo.keys(this.$[navigation.name+"List"].getSelection().getSelected()) == 0) {
+						if (enyo.keys(this.$[navigation.name+"List"].getSelection().getSelected()) === 0) {
 							links.push({navigation: navigation.name, entity: this.$[navigation.name+"List"].entitySetName, refProperties: enyo.Odata.entryDescription(this.$[navigation.name+"List"].refProperties, this.$[navigation.name+"List"].entries)});
 						}
 					}

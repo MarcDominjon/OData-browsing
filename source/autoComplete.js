@@ -100,7 +100,7 @@ enyo.kind({
 					this.doEscPressed();
 					break;
 			}
-			if (key == 'U+0020' && inEvent.ctrlKey == true) {
+			if (key == 'U+0020' && inEvent.ctrlKey === true) {
 				inEvent.preventDefault();
 				this.doEscPressed();
 			} else if (key == 'Left' || key == 'Right' || key == 'End' || key == 'Home' || key == 'PageUp' || key == 'PageDown') {
@@ -108,7 +108,7 @@ enyo.kind({
 			}
 			return true;
 		} else {
-			if (key == 'U+0020' && inEvent.ctrlKey == true) {
+			if (key == 'U+0020' && inEvent.ctrlKey === true) {
 				inEvent.preventDefault();
 				this.autoCompleteProcess(inSender, inEvent);
 			}
@@ -122,21 +122,18 @@ enyo.kind({
 		asyncCall.go();
 		
 		asyncCall.response(enyo.bind(this,function(inSender, inResponse) {
-			var cursorIndex = this.$.autoInput.hasNode().selectionStart;
 			var textInput = this.$.autoInput.getValue();
 			var cursorIndex = this.$.autoInput.hasNode().selectionStart;
-			var length = textInput.length;
-			
 			this.previousCursor = cursorIndex;
 			
-			if (textInput.charAt(cursorIndex-1) != ' ' && textInput.length && (textInput.charAt(cursorIndex) == ' ' || textInput.charAt(cursorIndex) == '')) {
+			if (textInput.charAt(cursorIndex-1) != ' ' && textInput.length && (textInput.charAt(cursorIndex) == ' ' || textInput.charAt(cursorIndex) === '')) {
 				var lastSpaceIndex = textInput.slice(0, cursorIndex).lastIndexOf(' ');
 				var partial = textInput.slice(lastSpaceIndex + 1, cursorIndex+1).trim();
 				var regexp = new RegExp(partial, 'i');
 				enyo.forEach(
 					this.bases,
 					function (element) {
-						if (element.notation.search(regexp) == 0) {
+						if (element.notation.search(regexp) === 0) {
 							this.suggestions.push(element);
 						}
 					},
@@ -175,10 +172,11 @@ enyo.kind({
 		var input = this.$.autoInput;
 		var textInput = input.getValue();
 		var lastSpace = textInput.slice(0, this.previousCursor).lastIndexOf(' ');
+		var insertion;
 		if (lastSpace == -1) {
-			var insertion = suggestion + ' ' + textInput.slice(this.previousCursor);
+			insertion = suggestion + ' ' + textInput.slice(this.previousCursor);
 		} else {
-			var insertion = textInput.slice(0, lastSpace+1) + suggestion + ' ' + textInput.slice(this.previousCursor);
+			insertion = textInput.slice(0, lastSpace+1) + suggestion + ' ' + textInput.slice(this.previousCursor);
 		}
 		input.setValue(insertion);
 		input.hasNode().selectionStart = (lastSpace + 2 + suggestion.length);
