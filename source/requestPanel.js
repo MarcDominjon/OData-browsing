@@ -27,7 +27,6 @@ enyo.kind({
 	
 	create : function() {
 		this.inherited(arguments);
-		if (!this.draggable) this.log(this);
 		this.render();
 	},
 	
